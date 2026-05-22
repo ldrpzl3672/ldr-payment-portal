@@ -1,496 +1,338 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Lester Digital Payment Portal</title>
-  <style>
-    :root {
-      --ldr-blue: #0098cc;
-      --ldr-blue-dark: #007fab;
-      --ldr-green: #9fbe3b;
-      --ldr-green-dark: #7f9d24;
-      --light: #f5f9fc;
-      --text: #1f2933;
-      --muted: #6b7280;
-      --border: #d9e2ec;
-      --success: #0f766e;
-      --danger: #b42318;
-      --white: #ffffff;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lester Digital Payment Portal</title>
 
-    * { box-sizing: border-box; }
+<style>
+body{
+    margin:0;
+    font-family:Arial,Helvetica,sans-serif;
+    background:#f4f4f4;
+    color:#222;
+}
 
-    body {
-      margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background: var(--light);
-      color: var(--text);
-    }
+.topbar{
+    background:#0094d9;
+    color:white;
+    text-align:center;
+    padding:8px;
+    font-size:12px;
+}
 
-    .topbar {
-      background: var(--ldr-blue);
-      color: white;
-      font-size: 14px;
-      padding: 8px 18px;
-      display: flex;
-      justify-content: center;
-      gap: 28px;
-      flex-wrap: wrap;
-    }
+.hero{
+    background:url('https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=1800&auto=format&fit=crop') center/cover;
+    padding:70px 20px;
+    border-top:4px solid #8dc63f;
+    border-bottom:4px solid #8dc63f;
+}
 
-    .header {
-      background: white;
-      border-bottom: 4px solid var(--ldr-green);
-      padding: 18px;
-    }
+.hero-inner{
+    max-width:1200px;
+    margin:auto;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+}
 
-    .header-inner {
-      max-width: 1120px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 18px;
-    }
+.hero-text{
+    color:#111;
+}
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
+.hero-text h1{
+    margin:0;
+    font-size:42px;
+}
 
-    .logo-mark {
-      width: 58px;
-      height: 58px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, var(--ldr-blue), var(--ldr-green));
-      color: white;
-      font-weight: 800;
-      display: grid;
-      place-items: center;
-      font-size: 22px;
-      letter-spacing: 1px;
-    }
+.hero-text p{
+    margin-top:10px;
+    font-size:18px;
+}
 
-    .brand h1 {
-      margin: 0;
-      color: var(--ldr-blue-dark);
-      font-size: 24px;
-    }
+.lookup-box{
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    width:320px;
+    box-shadow:0 4px 12px rgba(0,0,0,.15);
+}
 
-    .brand p {
-      margin: 2px 0 0;
-      color: var(--muted);
-      font-size: 14px;
-    }
+.lookup-box h3{
+    margin-top:0;
+    color:#0094d9;
+}
 
-    .secure-badge {
-      background: #ecfdf5;
-      border: 1px solid #99f6e4;
-      color: var(--success);
-      padding: 10px 14px;
-      border-radius: 999px;
-      font-weight: 700;
-      font-size: 14px;
-      white-space: nowrap;
-    }
+.lookup-box input{
+    width:100%;
+    padding:12px;
+    border:1px solid #ccc;
+    border-radius:5px;
+    margin-bottom:12px;
+}
 
-    .hero {
-      background: linear-gradient(rgba(255,255,255,.82), rgba(255,255,255,.82)), url('https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1600&q=80');
-      background-size: cover;
-      background-position: center;
-      color: #111827;
-      padding: 58px 18px;
-      border-top: 4px solid var(--ldr-green);
-      border-bottom: 4px solid var(--ldr-green);
-    }
+.lookup-box button{
+    width:100%;
+    background:#0094d9;
+    color:white;
+    border:none;
+    padding:12px;
+    border-radius:5px;
+    cursor:pointer;
+    font-size:16px;
+}
 
-    .hero-inner {
-      max-width: 1120px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: 1.25fr .75fr;
-      gap: 28px;
-      align-items: center;
-    }
+.main{
+    max-width:1200px;
+    margin:30px auto;
+    display:flex;
+    gap:20px;
+    padding:0 20px;
+    flex-wrap:wrap;
+}
 
-    .hero h2 {
-      font-size: 38px;
-      line-height: 1.08;
-      margin: 0 0 12px;
-    }
+.invoice-panel{
+    flex:1;
+    min-width:700px;
+    background:white;
+    border-radius:10px;
+    padding:20px;
+    box-shadow:0 2px 8px rgba(0,0,0,.1);
+}
 
-    .hero p {
-      margin: 0;
-      font-size: 18px;
-      opacity: .95;
-    }
+.summary-panel{
+    width:300px;
+    background:white;
+    border-radius:10px;
+    padding:20px;
+    box-shadow:0 2px 8px rgba(0,0,0,.1);
+    height:fit-content;
+}
 
-    .lookup-card, .panel, .summary-card {
-      background: white;
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      box-shadow: 0 14px 28px rgba(15, 23, 42, .08);
-    }
+table{
+    width:100%;
+    border-collapse:collapse;
+}
 
-    .lookup-card {
-      color: var(--text);
-      padding: 22px;
-    }
+th{
+    text-align:left;
+    border-bottom:2px solid #ddd;
+    padding:12px 8px;
+    font-size:13px;
+    color:#666;
+}
 
-    .lookup-card h3 {
-      margin: 0 0 8px;
-      color: var(--ldr-blue-dark);
-    }
+td{
+    padding:12px 8px;
+    border-bottom:1px solid #eee;
+    font-size:14px;
+}
 
-    .lookup-card label {
-      display: block;
-      font-size: 13px;
-      font-weight: 700;
-      margin-top: 14px;
-      color: var(--muted);
-    }
+.status{
+    padding:4px 8px;
+    border-radius:12px;
+    font-size:12px;
+    color:white;
+    display:inline-block;
+}
 
-    .lookup-card input {
-      width: 100%;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 13px 12px;
-      font-size: 16px;
-      margin-top: 6px;
-    }
+.sent{
+    background:#ff9800;
+}
 
-    .btn {
-      border: none;
-      border-radius: 10px;
-      padding: 13px 18px;
-      font-size: 16px;
-      font-weight: 800;
-      cursor: pointer;
-    }
+.overdue{
+    background:#d32f2f;
+}
 
-    .btn-primary {
-      background: var(--ldr-blue);
-      color: white;
-      width: 100%;
-      margin-top: 18px;
-    }
+.total-box{
+    margin-top:20px;
+    font-size:18px;
+    font-weight:bold;
+}
 
-    .btn-blue {
-      background: var(--ldr-green);
-      color: white;
-    }
-
-    .main {
-      max-width: 1120px;
-      margin: 28px auto;
-      padding: 0 18px 36px;
-      display: grid;
-      grid-template-columns: 1fr 330px;
-      gap: 24px;
-    }
-
-    .panel {
-      overflow: hidden;
-    }
-
-    .panel-header {
-      padding: 18px 20px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .panel-header h3 {
-      margin: 0;
-      color: var(--ldr-blue-dark);
-    }
-
-    .customer-chip {
-      background: #eef9fc;
-      color: var(--ldr-blue-dark);
-      border: 1px solid #b9e4f2;
-      padding: 8px 10px;
-      border-radius: 999px;
-      font-weight: 700;
-      font-size: 13px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    th, td {
-      padding: 14px 16px;
-      border-bottom: 1px solid var(--border);
-      text-align: left;
-      vertical-align: middle;
-    }
-
-    th {
-      color: var(--muted);
-      font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: .04em;
-      background: #ffffff;
-    }
-
-    td.amount, th.amount { text-align: right; }
-
-    .job-name {
-      font-weight: 800;
-      color: var(--ldr-blue-dark);
-    }
-
-    .invoice-num {
-      color: var(--muted);
-      font-size: 13px;
-      margin-top: 3px;
-    }
-
-    .status {
-      display: inline-flex;
-      padding: 5px 8px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 800;
-      background: #fff7ed;
-      color: #c2410c;
-    }
-
-    .summary-card {
-      padding: 20px;
-      position: sticky;
-      top: 16px;
-    }
-
-    .summary-card h3 {
-      margin: 0 0 16px;
-      color: var(--ldr-blue-dark);
-    }
-
-    .summary-row {
-      display: flex;
-      justify-content: space-between;
-      border-bottom: 1px solid var(--border);
-      padding: 10px 0;
-      gap: 12px;
-    }
-
-    .summary-row.total {
-      font-size: 22px;
-      font-weight: 900;
-      border-bottom: none;
-      padding-top: 16px;
-    }
-
-    .payment-methods {
-      margin-top: 18px;
-      background: #ffffff;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px;
-      font-size: 14px;
-      color: var(--muted);
-    }
-
-    .payment-methods strong {
-      color: var(--text);
-    }
-
-    .footer {
-      border-top: 4px solid var(--ldr-green);
-      background: var(--ldr-blue);
-      padding: 22px 18px;
-      color: white;
-      font-size: 14px;
-    }
-
-    .footer-inner {
-      max-width: 1120px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-
-    @media (max-width: 860px) {
-      .hero-inner, .main {
-        grid-template-columns: 1fr;
-      }
-
-      .hero h2 { font-size: 30px; }
-      .header-inner { align-items: flex-start; flex-direction: column; }
-      .summary-card { position: static; }
-      table { min-width: 680px; }
-      .table-wrap { overflow-x: auto; }
-    }
-  </style>
+.pay-btn{
+    width:100%;
+    margin-top:20px;
+    background:#8dc63f;
+    color:white;
+    border:none;
+    padding:14px;
+    border-radius:5px;
+    font-size:18px;
+    cursor:pointer;
+}
+</style>
 </head>
+
 <body>
-  <div class="topbar">
-    <span>1633 W Main Street, Suite 900, Lebanon, TN 37087</span>
-    <span>print@ldrepro.com</span>
-  </div>
 
-  <header class="header">
-    <div class="header-inner">
-      <div class="brand">
-        <div class="logo-mark">LDR</div>
-        <div>
-          <h1>Lester Digital Reprographics</h1>
-          <p>Big city services, small town courtesy</p>
-        </div>
-      </div>
-      
-    </div>
-  </header>
+<div class="topbar">
+1633 W Main Street, Suite 900, Lebanon, TN 37087 | print@ldrepro.com
+</div>
 
-  <section class="hero">
+<div class="hero">
     <div class="hero-inner">
-      <div>
-        <h2>Lester Digital Payment Portal</h2>
-        <p>Select multiple open invoices and make one secure ACH or card payment.</p>
-      </div>
-      <div class="lookup-card">
-        <h3>Find your invoices</h3>
-        <p style="margin:0;color:var(--muted);font-size:14px;">Use the secure link from your email, or enter your access code.</p>
-        <label for="code">Payment access code</label>
-        <input id="code" value="LDR-DEMO-2481" />
-        <button class="btn btn-primary">View Open Invoices</button>
-      </div>
-    </div>
-  </section>
 
-  <main class="main">
-    <section class="panel">
-      <div class="panel-header">
-        <h3>Open Invoices</h3>
-        <span class="customer-chip" id="customerName">Customer: Loading...</span>
-      </div>
-      <div class="table-wrap">
+        <div class="hero-text">
+            <h1>Lester Digital Payment Portal</h1>
+            <p>Select multiple invoices and make one secure ACH or card payment.</p>
+        </div>
+
+        <div class="lookup-box">
+            <h3>Find your invoices</h3>
+
+            <input type="text" id="accessCode" value="LDR-DEMO-2401">
+
+            <button onclick="loadInvoices()">
+                View Open Invoices
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<div class="main">
+
+    <div class="invoice-panel">
+
+        <h2>Open Invoices</h2>
+
         <table>
-          <thead>
-            <tr>
-              <th></th>
-              <th>Invoice</th>
-              <th>Due</th>
-              <th>Status</th>
-              <th class="amount">Balance</th>
-            </tr>
-          </thead>
-          <tbody id="invoiceRows">
-            <tr>
-              <td colspan="5" style="text-align:center;color:var(--muted);padding:28px;">Loading invoices...</td>
-            </tr>
-          </tbody>
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Invoice</th>
+                    <th>Customer</th>
+                    <th>Due</th>
+                    <th>Status</th>
+                    <th style="text-align:right;">Balance</th>
+                </tr>
+            </thead>
+
+            <tbody id="invoiceTable"></tbody>
         </table>
-      </div>
-    </section>
 
-    <aside class="summary-card">
-      <h3>Payment Summary</h3>
-      <div class="summary-row">
-        <span>Selected invoices</span>
-        <strong id="selectedCount">0</strong>
-      </div>
-      <div class="summary-row">
-        <span>ACH/card subtotal</span>
-        <strong id="subtotalAmount">$0.00</strong>
-      </div>
-      <div class="summary-row">
-        <span>Convenience fee</span>
-        <strong>$0.00</strong>
-      </div>
-      <div class="summary-row total">
-        <span>Total</span>
-        <span id="totalAmount">$0.00</span>
-      </div>
-      <button class="btn btn-blue" style="width:100%;margin-top:18px;">Continue to Payment</button>
-      <div class="payment-methods">
-        <strong>Accepted payment methods</strong><br />
-        ACH bank transfer and credit/debit card. Payment will be securely processed and applied to the selected invoices.
-      </div>
-    </aside>
-  </main>
-
-  <footer class="footer">
-    <div class="footer-inner">
-      <span>© 2026 Lester Digital Reprographics</span>
-      <span>Questions? Email print@ldrepro.com or call the shop during business hours.</span>
     </div>
-  </footer>
-  <script>
-    const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
 
-    let invoiceData = null;
+    <div class="summary-panel">
 
-    async function loadInvoices() {
-      try {
-        const response = await fetch("https://ldr-payment-api.ldrpzl3672.workers.dev/api/invoices");
-        if (!response.ok) throw new Error('Could not load invoices.json');
-        invoiceData = await response.json();
-        renderInvoices();
-      } catch (error) {
-        document.getElementById('invoiceRows').innerHTML = `
-          <tr>
-            <td colspan="5" style="text-align:center;color:var(--danger);padding:28px;">
-              Could not load invoice data. Make sure invoices.json exists in this GitHub repo.
+        <h3>Payment Summary</h3>
+
+        <div>Selected Invoices: <span id="selectedCount">0</span></div>
+
+        <div style="margin-top:10px;">
+            Invoice Total:
+            <span id="invoiceTotal">$0.00</span>
+        </div>
+
+        <div style="margin-top:10px;">
+            ACH Fee:
+            <span>$0.00</span>
+        </div>
+
+        <div class="total-box">
+            Total:
+            <span id="grandTotal">$0.00</span>
+        </div>
+
+        <button class="pay-btn">
+            Continue to Payment
+        </button>
+
+    </div>
+
+</div>
+
+<script>
+let invoices = [];
+
+async function loadInvoices(){
+
+    const response = await fetch(
+        "https://ldr-payment-api.ldrpzl3672.workers.dev/api/invoices"
+    );
+
+    const data = await response.json();
+
+    invoices = data.invoices || [];
+
+    renderInvoices();
+}
+
+function renderInvoices(){
+
+    const table = document.getElementById("invoiceTable");
+
+    table.innerHTML = "";
+
+    invoices.forEach(invoice => {
+
+        const tr = document.createElement("tr");
+
+        const statusClass =
+            invoice.status === "overdue"
+            ? "overdue"
+            : "sent";
+
+        tr.innerHTML = `
+            <td>
+                <input
+                    type="checkbox"
+                    onchange="updateTotals()"
+                    data-balance="${invoice.balance}"
+                >
             </td>
-          </tr>`;
-      }
-    }
 
-    function renderInvoices() {
-      document.getElementById('customerName').textContent = `Customer: ${invoiceData.customer_name}`;
-      const rows = invoiceData.invoices.map((invoice, index) => `
-        <tr>
-          <td><input type="checkbox" class="invoice-check" data-index="${index}" ${invoice.selected ? 'checked' : ''} /></td>
-          <td>
-            <div class="job-name">${escapeHtml(invoice.job_name)}</div>
-            <div class="invoice-num">Invoice #${escapeHtml(invoice.invoice_number)}</div>
-          </td>
-          <td>${escapeHtml(invoice.due_date)}</td>
-          <td><span class="status">${escapeHtml(invoice.status)}</span></td>
-          <td class="amount">${money.format(invoice.balance)}</td>
-        </tr>
-      `).join('');
+            <td>
+                <strong>${invoice.invoice_number}</strong>
+            </td>
 
-      document.getElementById('invoiceRows').innerHTML = rows;
-      document.querySelectorAll('.invoice-check').forEach(box => {
-        box.addEventListener('change', updateSummary);
-      });
-      updateSummary();
-    }
+            <td>
+                ${invoice.customer_name}
+            </td>
 
-    function updateSummary() {
-      const checked = [...document.querySelectorAll('.invoice-check:checked')];
-      const subtotal = checked.reduce((sum, box) => {
-        const invoice = invoiceData.invoices[Number(box.dataset.index)];
-        return sum + Number(invoice.balance || 0);
-      }, 0);
+            <td>
+                ${invoice.due_date}
+            </td>
 
-      document.getElementById('selectedCount').textContent = checked.length;
-      document.getElementById('subtotalAmount').textContent = money.format(subtotal);
-      document.getElementById('totalAmount').textContent = money.format(subtotal);
-    }
+            <td>
+                <span class="status ${statusClass}">
+                    ${invoice.status}
+                </span>
+            </td>
 
-    function escapeHtml(value) {
-      return String(value)
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#039;');
-    }
+            <td style="text-align:right;">
+                $${Number(invoice.balance).toFixed(2)}
+            </td>
+        `;
 
-    loadInvoices();
-  </script>
+        table.appendChild(tr);
+    });
+}
+
+function updateTotals(){
+
+    const checks = document.querySelectorAll(
+        'input[type="checkbox"]:checked'
+    );
+
+    let total = 0;
+
+    checks.forEach(check => {
+        total += Number(check.dataset.balance);
+    });
+
+    document.getElementById("selectedCount").innerText =
+        checks.length;
+
+    document.getElementById("invoiceTotal").innerText =
+        `$${total.toFixed(2)}`;
+
+    document.getElementById("grandTotal").innerText =
+        `$${total.toFixed(2)}`;
+}
+</script>
+
 </body>
 </html>
