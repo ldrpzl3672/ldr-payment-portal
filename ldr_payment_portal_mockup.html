@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lester Digital Payment Portal</title>
+  <style>
+    :root {
+      --ldr-blue: #0098cc;
+      --ldr-blue-dark: #007fab;
+      --ldr-green: #9fbe3b;
+      --ldr-green-dark: #7f9d24;
+      --light: #f5f9fc;
+      --text: #1f2933;
+      --muted: #6b7280;
+      --border: #d9e2ec;
+      --success: #0f766e;
+      --danger: #b42318;
+      --white: #ffffff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--light);
+      color: var(--text);
+    }
+
+    .topbar {
+      background: var(--ldr-blue);
+      color: white;
+      font-size: 14px;
+      padding: 8px 18px;
+      display: flex;
+      justify-content: center;
+      gap: 28px;
+      flex-wrap: wrap;
+    }
+
+    .header {
+      background: white;
+      border-bottom: 4px solid var(--ldr-green);
+      padding: 18px;
+    }
+
+    .header-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo-mark {
+      width: 58px;
+      height: 58px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--ldr-blue), var(--ldr-green));
+      color: white;
+      font-weight: 800;
+      display: grid;
+      place-items: center;
+      font-size: 22px;
+      letter-spacing: 1px;
+    }
+
+    .brand h1 {
+      margin: 0;
+      color: var(--ldr-blue-dark);
+      font-size: 24px;
+    }
+
+    .brand p {
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .secure-badge {
+      background: #ecfdf5;
+      border: 1px solid #99f6e4;
+      color: var(--success);
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    .hero {
+      background: linear-gradient(rgba(255,255,255,.82), rgba(255,255,255,.82)), url('https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=1600&q=80');
+      background-size: cover;
+      background-position: center;
+      color: #111827;
+      padding: 58px 18px;
+      border-top: 4px solid var(--ldr-green);
+      border-bottom: 4px solid var(--ldr-green);
+    }
+
+    .hero-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.25fr .75fr;
+      gap: 28px;
+      align-items: center;
+    }
+
+    .hero h2 {
+      font-size: 38px;
+      line-height: 1.08;
+      margin: 0 0 12px;
+    }
+
+    .hero p {
+      margin: 0;
+      font-size: 18px;
+      opacity: .95;
+    }
+
+    .lookup-card, .panel, .summary-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 14px 28px rgba(15, 23, 42, .08);
+    }
+
+    .lookup-card {
+      color: var(--text);
+      padding: 22px;
+    }
+
+    .lookup-card h3 {
+      margin: 0 0 8px;
+      color: var(--ldr-blue-dark);
+    }
+
+    .lookup-card label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      margin-top: 14px;
+      color: var(--muted);
+    }
+
+    .lookup-card input {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 13px 12px;
+      font-size: 16px;
+      margin-top: 6px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 10px;
+      padding: 13px 18px;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: var(--ldr-blue);
+      color: white;
+      width: 100%;
+      margin-top: 18px;
+    }
+
+    .btn-blue {
+      background: var(--ldr-green);
+      color: white;
+    }
+
+    .main {
+      max-width: 1120px;
+      margin: 28px auto;
+      padding: 0 18px 36px;
+      display: grid;
+      grid-template-columns: 1fr 330px;
+      gap: 24px;
+    }
+
+    .panel {
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .panel-header h3 {
+      margin: 0;
+      color: var(--ldr-blue-dark);
+    }
+
+    .customer-chip {
+      background: #eef9fc;
+      color: var(--ldr-blue-dark);
+      border: 1px solid #b9e4f2;
+      padding: 8px 10px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      background: #ffffff;
+    }
+
+    td.amount, th.amount { text-align: right; }
+
+    .job-name {
+      font-weight: 800;
+      color: var(--ldr-blue-dark);
+    }
+
+    .invoice-num {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 3px;
+    }
+
+    .status {
+      display: inline-flex;
+      padding: 5px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      background: #fff7ed;
+      color: #c2410c;
+    }
+
+    .summary-card {
+      padding: 20px;
+      position: sticky;
+      top: 16px;
+    }
+
+    .summary-card h3 {
+      margin: 0 0 16px;
+      color: var(--ldr-blue-dark);
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      padding: 10px 0;
+      gap: 12px;
+    }
+
+    .summary-row.total {
+      font-size: 22px;
+      font-weight: 900;
+      border-bottom: none;
+      padding-top: 16px;
+    }
+
+    .payment-methods {
+      margin-top: 18px;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .payment-methods strong {
+      color: var(--text);
+    }
+
+    .footer {
+      border-top: 4px solid var(--ldr-green);
+      background: var(--ldr-blue);
+      padding: 22px 18px;
+      color: white;
+      font-size: 14px;
+    }
+
+    .footer-inner {
+      max-width: 1120px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 860px) {
+      .hero-inner, .main {
+        grid-template-columns: 1fr;
+      }
+
+      .hero h2 { font-size: 30px; }
+      .header-inner { align-items: flex-start; flex-direction: column; }
+      .summary-card { position: static; }
+      table { min-width: 680px; }
+      .table-wrap { overflow-x: auto; }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <span>1633 W Main Street, Suite 900, Lebanon, TN 37087</span>
+    <span>print@ldrepro.com</span>
+  </div>
+
+  <header class="header">
+    <div class="header-inner">
+      <div class="brand">
+        <div class="logo-mark">LDR</div>
+        <div>
+          <h1>Lester Digital Reprographics</h1>
+          <p>Big city services, small town courtesy</p>
+        </div>
+      </div>
+      
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-inner">
+      <div>
+        <h2>Lester Digital Payment Portal</h2>
+        <p>Select multiple open invoices and make one secure ACH or card payment.</p>
+      </div>
+      <div class="lookup-card">
+        <h3>Find your invoices</h3>
+        <p style="margin:0;color:var(--muted);font-size:14px;">Use the secure link from your email, or enter your access code.</p>
+        <label for="code">Payment access code</label>
+        <input id="code" value="LDR-DEMO-2481" />
+        <button class="btn btn-primary">View Open Invoices</button>
+      </div>
+    </div>
+  </section>
+
+  <main class="main">
+    <section class="panel">
+      <div class="panel-header">
+        <h3>Open Invoices</h3>
+        <span class="customer-chip">Customer: Music City Masonry</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th></th>
+              <th>Invoice</th>
+              <th>Due</th>
+              <th>Status</th>
+              <th class="amount">Balance</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><input type="checkbox" checked /></td>
+              <td>
+                <div class="job-name">Wilson County Schools Addendum 02</div>
+                <div class="invoice-num">Invoice #28003</div>
+              </td>
+              <td>06/21/2026</td>
+              <td><span class="status">Open</span></td>
+              <td class="amount">$412.55</td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" checked /></td>
+              <td>
+                <div class="job-name">Lebanon Fire Station Bid Set</div>
+                <div class="invoice-num">Invoice #28004</div>
+              </td>
+              <td>06/21/2026</td>
+              <td><span class="status">Open</span></td>
+              <td class="amount">$188.10</td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" /></td>
+              <td>
+                <div class="job-name">VA Clinic Revisions</div>
+                <div class="invoice-num">Invoice #28005</div>
+              </td>
+              <td>06/21/2026</td>
+              <td><span class="status">Open</span></td>
+              <td class="amount">$73.42</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <aside class="summary-card">
+      <h3>Payment Summary</h3>
+      <div class="summary-row">
+        <span>Selected invoices</span>
+        <strong>2</strong>
+      </div>
+      <div class="summary-row">
+        <span>ACH/card subtotal</span>
+        <strong>$600.65</strong>
+      </div>
+      <div class="summary-row">
+        <span>Convenience fee</span>
+        <strong>$0.00</strong>
+      </div>
+      <div class="summary-row total">
+        <span>Total</span>
+        <span>$600.65</span>
+      </div>
+      <button class="btn btn-blue" style="width:100%;margin-top:18px;">Continue to Payment</button>
+      <div class="payment-methods">
+        <strong>Accepted payment methods</strong><br />
+        ACH bank transfer and credit/debit card. Payment will be securely processed and applied to the selected invoices.
+      </div>
+    </aside>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <span>© 2026 Lester Digital Reprographics</span>
+      <span>Questions? Email print@ldrepro.com or call the shop during business hours.</span>
+    </div>
+  </footer>
+</body>
+</html>
