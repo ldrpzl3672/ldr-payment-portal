@@ -167,6 +167,11 @@ td{
     cursor:pointer;
 }
 
+.pay-btn:disabled{
+    opacity:.6;
+    cursor:not-allowed;
+}
+
 .error-box{
     background:#ffebee;
     border:1px solid #e57373;
@@ -249,7 +254,11 @@ td{
             <span id="grandTotal">$0.00</span>
         </div>
 
-        <button class="pay-btn">
+        <button
+            class="pay-btn"
+            id="payButton"
+            onclick="continueToPayment()"
+        >
             Continue to Payment
         </button>
     </div>
@@ -283,6 +292,7 @@ async function loadInvoices(){
     }
 
     try {
+
         const response = await fetch(
             `https://ldr-payment-api.ldrpzl3672.workers.dev/api/invoices?token=${token}`
         );
@@ -295,9 +305,11 @@ async function loadInvoices(){
         }
 
         invoices = data.invoices || [];
+
         renderInvoices();
 
     } catch (err) {
+
         showError("Unable to load invoices.");
     }
 }
@@ -305,15 +317,19 @@ async function loadInvoices(){
 function renderInvoices(){
 
     const table = document.getElementById("invoiceTable");
+
     table.innerHTML = "";
 
     if (invoices.length === 0) {
+
         table.innerHTML = `
             <tr>
                 <td colspan="6">No open invoices found.</td>
             </tr>
         `;
+
         updateTotals();
+
         return;
     }
 
@@ -331,6 +347,7 @@ function renderInvoices(){
                 <input
                     type="checkbox"
                     onchange="updateTotals()"
+                    data-id="${invoice.invoice_id}"
                     data-balance="${invoice.balance}"
                 >
             </td>
@@ -386,14 +403,90 @@ function updateTotals(){
         `$${total.toFixed(2)}`;
 }
 
+async function continueToPayment(){
+
+    const button = document.getElementById("payButton");
+
+    const checks = document.querySelectorAll(
+        'input[type="checkbox"]:checked'
+    );
+
+    if (checks.length === 0) {
+
+        showError("Please select at least one invoice.");
+
+        return;
+    }
+
+    button.disabled = true;
+    button.innerText = "Creating Secure Checkout...";
+
+    try {
+
+        let total = 0;
+
+        const invoiceIds = [];
+
+        checks.forEach(check => {
+
+            total += Number(check.dataset.balance);
+
+            invoiceIds.push(check.dataset.id);
+        });
+
+        const response = await fetch(
+            "https://ldr-payment-api.ldrpzl3672.workers.dev/api/create-checkout-session",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    token,
+                    invoiceIds,
+                    amount: total
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok || data.error) {
+
+            console.error(data);
+
+            showError(
+                "Unable to create payment session."
+            );
+
+            button.disabled = false;
+            button.innerText = "Continue to Payment";
+
+            return;
+        }
+
+        window.location.href = data.checkoutUrl;
+
+    } catch (err) {
+
+        console.error(err);
+
+        showError(
+            "Unable to connect to payment system."
+        );
+
+        button.disabled = false;
+        button.innerText = "Continue to Payment";
+    }
+}
+
 function showError(message){
 
     const errorBox = document.getElementById("errorBox");
 
     errorBox.style.display = "block";
-    errorBox.innerText = message;
 
-    document.getElementById("invoiceTable").innerHTML = "";
+    errorBox.innerText = message;
 }
 </script>
 
