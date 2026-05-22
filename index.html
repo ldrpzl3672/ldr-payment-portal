@@ -181,6 +181,32 @@ td{
     margin-bottom:20px;
     display:none;
 }
+
+.portal-message{
+    max-width:1200px;
+    margin:20px auto 0;
+    padding:0 20px;
+    display:none;
+}
+
+.portal-message-inner{
+    border-radius:8px;
+    padding:14px 16px;
+    font-size:15px;
+    box-shadow:0 2px 8px rgba(0,0,0,.08);
+}
+
+.portal-message.success .portal-message-inner{
+    background:#e8f5e9;
+    border:1px solid #81c784;
+    color:#1b5e20;
+}
+
+.portal-message.cancelled .portal-message-inner{
+    background:#fff8e1;
+    border:1px solid #ffcc80;
+    color:#7a4b00;
+}
 </style>
 </head>
 
@@ -203,6 +229,10 @@ td{
             <button onclick="loadInvoices()">Refresh Invoices</button>
         </div>
     </div>
+</div>
+
+<div class="portal-message" id="portalMessage">
+    <div class="portal-message-inner" id="portalMessageInner"></div>
 </div>
 
 <div class="main">
@@ -270,16 +300,48 @@ let invoices = [];
 
 const urlParams = new URLSearchParams(window.location.search);
 const token = urlParams.get("token");
+const paymentStatus = urlParams.get("payment");
 
 document.getElementById("accessCode").value = token || "Missing payment token";
 
 window.addEventListener("DOMContentLoaded", () => {
+    showPaymentStatusMessage();
+
     if (token) {
         loadInvoices();
     } else {
         showError("Missing payment access token.");
     }
 });
+
+function showPaymentStatusMessage(){
+
+    const messageBox = document.getElementById("portalMessage");
+    const messageInner = document.getElementById("portalMessageInner");
+
+    if (!paymentStatus) {
+        return;
+    }
+
+    if (paymentStatus === "success") {
+        messageBox.className = "portal-message success";
+        messageBox.style.display = "block";
+        messageInner.innerHTML = `
+            <strong>Payment submitted successfully.</strong><br>
+            Your payment was received by Stripe. Paid invoices may take a moment to disappear from this portal.
+        `;
+        return;
+    }
+
+    if (paymentStatus === "cancelled") {
+        messageBox.className = "portal-message cancelled";
+        messageBox.style.display = "block";
+        messageInner.innerHTML = `
+            <strong>Payment was cancelled.</strong><br>
+            No payment was made. You can adjust your invoice selection and try again.
+        `;
+    }
+}
 
 async function loadInvoices(){
 
