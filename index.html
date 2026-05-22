@@ -372,7 +372,7 @@
     <section class="panel">
       <div class="panel-header">
         <h3>Open Invoices</h3>
-        <span class="customer-chip">Customer: Music City Masonry</span>
+        <span class="customer-chip" id="customerName">Customer: Loading...</span>
       </div>
       <div class="table-wrap">
         <table>
@@ -385,36 +385,9 @@
               <th class="amount">Balance</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody id="invoiceRows">
             <tr>
-              <td><input type="checkbox" checked /></td>
-              <td>
-                <div class="job-name">Wilson County Schools Addendum 02</div>
-                <div class="invoice-num">Invoice #28003</div>
-              </td>
-              <td>06/21/2026</td>
-              <td><span class="status">Open</span></td>
-              <td class="amount">$412.55</td>
-            </tr>
-            <tr>
-              <td><input type="checkbox" checked /></td>
-              <td>
-                <div class="job-name">Lebanon Fire Station Bid Set</div>
-                <div class="invoice-num">Invoice #28004</div>
-              </td>
-              <td>06/21/2026</td>
-              <td><span class="status">Open</span></td>
-              <td class="amount">$188.10</td>
-            </tr>
-            <tr>
-              <td><input type="checkbox" /></td>
-              <td>
-                <div class="job-name">VA Clinic Revisions</div>
-                <div class="invoice-num">Invoice #28005</div>
-              </td>
-              <td>06/21/2026</td>
-              <td><span class="status">Open</span></td>
-              <td class="amount">$73.42</td>
+              <td colspan="5" style="text-align:center;color:var(--muted);padding:28px;">Loading invoices...</td>
             </tr>
           </tbody>
         </table>
@@ -425,11 +398,11 @@
       <h3>Payment Summary</h3>
       <div class="summary-row">
         <span>Selected invoices</span>
-        <strong>2</strong>
+        <strong id="selectedCount">0</strong>
       </div>
       <div class="summary-row">
         <span>ACH/card subtotal</span>
-        <strong>$600.65</strong>
+        <strong id="subtotalAmount">$0.00</strong>
       </div>
       <div class="summary-row">
         <span>Convenience fee</span>
@@ -437,7 +410,7 @@
       </div>
       <div class="summary-row total">
         <span>Total</span>
-        <span>$600.65</span>
+        <span id="totalAmount">$0.00</span>
       </div>
       <button class="btn btn-blue" style="width:100%;margin-top:18px;">Continue to Payment</button>
       <div class="payment-methods">
@@ -453,5 +426,71 @@
       <span>Questions? Email print@ldrepro.com or call the shop during business hours.</span>
     </div>
   </footer>
+  <script>
+    const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+
+    let invoiceData = null;
+
+    async function loadInvoices() {
+      try {
+        const response = await fetch('invoices.json', { cache: 'no-store' });
+        if (!response.ok) throw new Error('Could not load invoices.json');
+        invoiceData = await response.json();
+        renderInvoices();
+      } catch (error) {
+        document.getElementById('invoiceRows').innerHTML = `
+          <tr>
+            <td colspan="5" style="text-align:center;color:var(--danger);padding:28px;">
+              Could not load invoice data. Make sure invoices.json exists in this GitHub repo.
+            </td>
+          </tr>`;
+      }
+    }
+
+    function renderInvoices() {
+      document.getElementById('customerName').textContent = `Customer: ${invoiceData.customer_name}`;
+      const rows = invoiceData.invoices.map((invoice, index) => `
+        <tr>
+          <td><input type="checkbox" class="invoice-check" data-index="${index}" ${invoice.selected ? 'checked' : ''} /></td>
+          <td>
+            <div class="job-name">${escapeHtml(invoice.job_name)}</div>
+            <div class="invoice-num">Invoice #${escapeHtml(invoice.invoice_number)}</div>
+          </td>
+          <td>${escapeHtml(invoice.due_date)}</td>
+          <td><span class="status">${escapeHtml(invoice.status)}</span></td>
+          <td class="amount">${money.format(invoice.balance)}</td>
+        </tr>
+      `).join('');
+
+      document.getElementById('invoiceRows').innerHTML = rows;
+      document.querySelectorAll('.invoice-check').forEach(box => {
+        box.addEventListener('change', updateSummary);
+      });
+      updateSummary();
+    }
+
+    function updateSummary() {
+      const checked = [...document.querySelectorAll('.invoice-check:checked')];
+      const subtotal = checked.reduce((sum, box) => {
+        const invoice = invoiceData.invoices[Number(box.dataset.index)];
+        return sum + Number(invoice.balance || 0);
+      }, 0);
+
+      document.getElementById('selectedCount').textContent = checked.length;
+      document.getElementById('subtotalAmount').textContent = money.format(subtotal);
+      document.getElementById('totalAmount').textContent = money.format(subtotal);
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    loadInvoices();
+  </script>
 </body>
 </html>
