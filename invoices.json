@@ -1,1 +1,22 @@
 
+{
+  "customer_name": "Music City Masonry",
+  "invoices": [
+    {
+      "invoice_number": "28003",
+      "job_name": "Wilson County Schools Addendum 02",
+      "due_date": "06/21/2026",
+      "status": "Open",
+      "balance": 412.55,
+      "selected": true
+    },
+    {
+      "invoice_number": "28004",
+      "job_name": "Lebanon Fire Station Bid Set",
+      "due_date": "06/21/2026",
+      "status": "Open",
+      "balance": 188.1,
+      "selected": true
+    }
+  ]
+}
