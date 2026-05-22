@@ -19,13 +19,12 @@ body{
     text-align:center;
     padding:8px;
     font-size:12px;
+    border-bottom:3px solid #8dc63f;
 }
 
 .hero{
     background:url('https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=1800&auto=format&fit=crop') center/cover;
     padding:70px 20px;
-    border-top:4px solid #8dc63f;
-    border-bottom:4px solid #8dc63f;
 }
 
 .hero-inner{
@@ -38,7 +37,8 @@ body{
 }
 
 .hero-text{
-    color:#111;
+    color:white;
+    text-shadow:0 2px 8px rgba(0,0,0,.7);
 }
 
 .hero-text h1{
@@ -70,6 +70,7 @@ body{
     border:1px solid #ccc;
     border-radius:5px;
     margin-bottom:12px;
+    box-sizing:border-box;
 }
 
 .lookup-box button{
@@ -162,6 +163,16 @@ td{
     font-size:18px;
     cursor:pointer;
 }
+
+.error-box{
+    background:#ffebee;
+    border:1px solid #e57373;
+    color:#c62828;
+    padding:12px;
+    border-radius:6px;
+    margin-bottom:20px;
+    display:none;
+}
 </style>
 </head>
 
@@ -182,7 +193,7 @@ td{
         <div class="lookup-box">
             <h3>Find your invoices</h3>
 
-            <input type="text" id="accessCode" value="LDR-DEMO-2401">
+            <input type="text" id="accessCode" readonly>
 
             <button onclick="loadInvoices()">
                 View Open Invoices
@@ -195,6 +206,8 @@ td{
 <div class="main">
 
     <div class="invoice-panel">
+
+        <div class="error-box" id="errorBox"></div>
 
         <h2>Open Invoices</h2>
 
@@ -219,7 +232,10 @@ td{
 
         <h3>Payment Summary</h3>
 
-        <div>Selected Invoices: <span id="selectedCount">0</span></div>
+        <div>
+            Selected Invoices:
+            <span id="selectedCount">0</span>
+        </div>
 
         <div style="margin-top:10px;">
             Invoice Total:
@@ -247,17 +263,43 @@ td{
 <script>
 let invoices = [];
 
+const urlParams = new URLSearchParams(window.location.search);
+const token = urlParams.get("token");
+
+document.getElementById("accessCode").value = token || "";
+
 async function loadInvoices(){
 
-    const response = await fetch(
-        "https://ldr-payment-api.ldrpzl3672.workers.dev/api/invoices"
-    );
+    const errorBox = document.getElementById("errorBox");
+    errorBox.style.display = "none";
 
-    const data = await response.json();
+    if (!token) {
+        showError("Missing payment access token.");
+        return;
+    }
 
-    invoices = data.invoices || [];
+    try {
 
-    renderInvoices();
+        const response = await fetch(
+            `https://ldr-payment-api.ldrpzl3672.workers.dev/api/invoices?token=${token}`
+        );
+
+        const data = await response.json();
+
+        if (data.error) {
+            showError(data.error);
+            return;
+        }
+
+        invoices = data.invoices || [];
+
+        renderInvoices();
+
+    } catch (err) {
+
+        showError("Unable to load invoices.");
+
+    }
 }
 
 function renderInvoices(){
@@ -331,6 +373,14 @@ function updateTotals(){
 
     document.getElementById("grandTotal").innerText =
         `$${total.toFixed(2)}`;
+}
+
+function showError(message){
+
+    const errorBox = document.getElementById("errorBox");
+
+    errorBox.style.display = "block";
+    errorBox.innerText = message;
 }
 </script>
 
