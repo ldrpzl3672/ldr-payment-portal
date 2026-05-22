@@ -433,7 +433,7 @@
 
     async function loadInvoices() {
       try {
-        const response = await fetch('invoices.json', { cache: 'no-store' });
+        const response = await fetch('https://ldr-payment-api.ldrpzl3672.workers.dev/api/invoices');
         if (!response.ok) throw new Error('Could not load invoices.json');
         invoiceData = await response.json();
         renderInvoices();
