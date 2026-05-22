@@ -98,12 +98,18 @@ body{
 }
 
 .invoice-panel,
-.history-panel{
+.history-panel,
+.payment-detail-panel{
     background:white;
     border-radius:10px;
     padding:20px;
     box-shadow:0 2px 8px rgba(0,0,0,.1);
     margin-bottom:20px;
+}
+
+.payment-detail-panel{
+    display:none;
+    border-left:5px solid #0094d9;
 }
 
 .summary-panel{
@@ -132,6 +138,14 @@ td{
     padding:12px 8px;
     border-bottom:1px solid #eee;
     font-size:14px;
+}
+
+.payment-row{
+    cursor:pointer;
+}
+
+.payment-row:hover{
+    background:#f1f8fc;
 }
 
 .status{
@@ -177,6 +191,16 @@ td{
     cursor:not-allowed;
 }
 
+.close-btn{
+    background:#666;
+    color:white;
+    border:none;
+    border-radius:5px;
+    padding:8px 12px;
+    cursor:pointer;
+    float:right;
+}
+
 .error-box{
     background:#ffebee;
     border:1px solid #e57373;
@@ -220,10 +244,31 @@ td{
     margin-bottom:16px;
 }
 
+.detail-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;
+    margin-bottom:18px;
+}
+
+.detail-item{
+    background:#f7f7f7;
+    border-radius:6px;
+    padding:10px;
+    font-size:14px;
+}
+
+.detail-label{
+    font-size:12px;
+    color:#666;
+    margin-bottom:4px;
+}
+
 @media(max-width:800px){
     .left-column,
     .invoice-panel,
-    .history-panel{
+    .history-panel,
+    .payment-detail-panel{
         min-width:100%;
     }
 
@@ -240,8 +285,13 @@ td{
     }
 
     .invoice-panel,
-    .history-panel{
+    .history-panel,
+    .payment-detail-panel{
         overflow-x:auto;
+    }
+
+    .detail-grid{
+        grid-template-columns:1fr;
     }
 }
 </style>
@@ -303,7 +353,7 @@ td{
         <div class="history-panel">
             <h2>Recent Payments</h2>
             <div class="small-note">
-                Recently recorded payments from your account.
+                Click a payment to view the invoices paid by that payment.
             </div>
 
             <table>
@@ -322,6 +372,15 @@ td{
                     </tr>
                 </tbody>
             </table>
+        </div>
+
+        <div class="payment-detail-panel" id="paymentDetailPanel">
+            <button class="close-btn" onclick="closePaymentDetail()">Close</button>
+            <h2>Payment Details</h2>
+
+            <div id="paymentDetailContent">
+                Loading payment detail...
+            </div>
         </div>
 
     </div>
@@ -363,6 +422,8 @@ td{
 <script>
 let invoices = [];
 let paymentHistory = [];
+
+const API_BASE = "https://ldr-payment-api.ldrpzl3672.workers.dev";
 
 const urlParams = new URLSearchParams(window.location.search);
 const token = urlParams.get("token");
@@ -422,7 +483,7 @@ async function loadInvoices(){
     try {
 
         const response = await fetch(
-            `https://ldr-payment-api.ldrpzl3672.workers.dev/api/invoices?token=${encodeURIComponent(token)}`
+            `${API_BASE}/api/invoices?token=${encodeURIComponent(token)}`
         );
 
         const data = await response.json();
@@ -439,7 +500,7 @@ async function loadInvoices(){
         renderPaymentHistory();
 
     } catch (err) {
-
+        console.error(err);
         showError("Unable to load invoices.");
     }
 }
@@ -531,6 +592,8 @@ function renderPaymentHistory(){
     paymentHistory.forEach(payment => {
 
         const tr = document.createElement("tr");
+        tr.className = "payment-row";
+        tr.onclick = () => loadPaymentDetail(payment.payment_id);
 
         tr.innerHTML = `
             <td>${escapeHtml(payment.date || "")}</td>
@@ -550,6 +613,134 @@ function renderPaymentHistory(){
 
         table.appendChild(tr);
     });
+}
+
+async function loadPaymentDetail(paymentId){
+
+    const panel = document.getElementById("paymentDetailPanel");
+    const content = document.getElementById("paymentDetailContent");
+
+    panel.style.display = "block";
+    content.innerHTML = "Loading payment detail...";
+
+    try {
+
+        const response = await fetch(
+            `${API_BASE}/api/payment-detail?token=${encodeURIComponent(token)}&paymentId=${encodeURIComponent(paymentId)}`
+        );
+
+        const data = await response.json();
+
+        if (!response.ok || data.error) {
+            content.innerHTML = `
+                <div class="error-box" style="display:block;">
+                    ${escapeHtml(data.error || "Unable to load payment detail.")}
+                </div>
+            `;
+            return;
+        }
+
+        renderPaymentDetail(data.payment);
+
+        panel.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
+
+    } catch (err) {
+
+        console.error(err);
+
+        content.innerHTML = `
+            <div class="error-box" style="display:block;">
+                Unable to load payment detail.
+            </div>
+        `;
+    }
+}
+
+function renderPaymentDetail(payment){
+
+    const content = document.getElementById("paymentDetailContent");
+
+    const invoicesPaid = payment.invoices || [];
+
+    let invoiceRows = "";
+
+    if (invoicesPaid.length === 0) {
+        invoiceRows = `
+            <tr>
+                <td colspan="5">No invoice detail found for this payment.</td>
+            </tr>
+        `;
+    } else {
+        invoicesPaid.forEach(invoice => {
+            invoiceRows += `
+                <tr>
+                    <td><strong>${escapeHtml(invoice.invoice_number || "")}</strong></td>
+                    <td>${escapeHtml(invoice.date || "")}</td>
+                    <td style="text-align:right;">$${Number(invoice.total || 0).toFixed(2)}</td>
+                    <td style="text-align:right;">$${Number(invoice.amount_applied || 0).toFixed(2)}</td>
+                    <td style="text-align:right;">$${Number(invoice.balance || 0).toFixed(2)}</td>
+                </tr>
+            `;
+        });
+    }
+
+    content.innerHTML = `
+        <div class="detail-grid">
+            <div class="detail-item">
+                <div class="detail-label">Payment #</div>
+                <strong>${escapeHtml(payment.payment_number || "")}</strong>
+            </div>
+
+            <div class="detail-item">
+                <div class="detail-label">Date</div>
+                <strong>${escapeHtml(payment.date || "")}</strong>
+            </div>
+
+            <div class="detail-item">
+                <div class="detail-label">Method</div>
+                <strong>${escapeHtml(payment.payment_mode || "")}</strong>
+            </div>
+
+            <div class="detail-item">
+                <div class="detail-label">Reference</div>
+                <strong>${escapeHtml(payment.reference_number || "")}</strong>
+            </div>
+
+            <div class="detail-item">
+                <div class="detail-label">Customer</div>
+                <strong>${escapeHtml(payment.customer_name || "")}</strong>
+            </div>
+
+            <div class="detail-item">
+                <div class="detail-label">Total Payment</div>
+                <strong>$${Number(payment.amount || 0).toFixed(2)}</strong>
+            </div>
+        </div>
+
+        <h3>Invoices Paid</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Invoice</th>
+                    <th>Date</th>
+                    <th style="text-align:right;">Invoice Total</th>
+                    <th style="text-align:right;">Amount Applied</th>
+                    <th style="text-align:right;">Balance</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${invoiceRows}
+            </tbody>
+        </table>
+    `;
+}
+
+function closePaymentDetail(){
+    document.getElementById("paymentDetailPanel").style.display = "none";
 }
 
 function updateTotals(){
@@ -606,7 +797,7 @@ async function continueToPayment(){
         });
 
         const response = await fetch(
-            "https://ldr-payment-api.ldrpzl3672.workers.dev/api/create-checkout-session",
+            `${API_BASE}/api/create-checkout-session`,
             {
                 method: "POST",
                 headers: {
