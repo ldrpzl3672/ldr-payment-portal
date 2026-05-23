@@ -1,34 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Lester Digital Payment Portal</title>
 
 <style>
 body{
     margin:0;
-    font-family:Arial,Helvetica,sans-serif;
-    background:#f4f4f4;
+    font-family:Arial,sans-serif;
+    background:#ececec;
     color:#222;
 }
 
-.topbar{
-    background:#0094d9;
-    color:white;
-    text-align:center;
-    padding:8px;
-    font-size:12px;
-    border-bottom:3px solid #8dc63f;
-}
-
 .hero{
-    position:relative;
     background:
-        linear-gradient(rgba(255,255,255,.78), rgba(255,255,255,.78)),
-        url('https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=1800&auto=format&fit=crop') center/cover;
-    padding:70px 20px;
-    border-bottom:4px solid #8dc63f;
+        linear-gradient(rgba(255,255,255,.80),rgba(255,255,255,.80)),
+        url('https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=1600&auto=format&fit=crop');
+    background-size:cover;
+    background-position:center;
+    padding:25px;
+    border-top:12px solid #0d88c9;
+    border-bottom:2px solid #7fbf3f;
 }
 
 .hero-inner{
@@ -36,89 +29,77 @@ body{
     margin:auto;
     display:flex;
     justify-content:space-between;
-    align-items:center;
+    align-items:flex-start;
+    gap:20px;
     flex-wrap:wrap;
 }
 
-.hero-text h1{
+.portal-title h1{
     margin:0;
     font-size:42px;
 }
 
-.hero-text p{
-    margin-top:10px;
-    font-size:18px;
+.portal-title p{
+    margin-top:8px;
+    color:#444;
 }
 
-.lookup-box{
+.token-box{
     background:white;
-    padding:20px;
     border-radius:10px;
-    width:320px;
-    box-shadow:0 4px 12px rgba(0,0,0,.15);
+    padding:16px;
+    width:260px;
+    box-shadow:0 2px 8px rgba(0,0,0,.12);
 }
 
-.lookup-box h3{
+.token-box h3{
     margin-top:0;
-    color:#0094d9;
 }
 
-.lookup-box input{
+.token-box input{
     width:100%;
-    padding:12px;
+    padding:10px;
     border:1px solid #ccc;
-    border-radius:5px;
-    margin-bottom:12px;
+    border-radius:6px;
+    margin-bottom:10px;
     box-sizing:border-box;
 }
 
-.lookup-box button{
-    width:100%;
-    background:#0094d9;
-    color:white;
-    border:none;
-    padding:12px;
-    border-radius:5px;
+button{
     cursor:pointer;
-    font-size:16px;
+    border:none;
+    border-radius:6px;
 }
 
-.main{
+.primary-btn{
+    background:#0d88c9;
+    color:white;
+    padding:10px 16px;
+    width:100%;
+    font-weight:bold;
+}
+
+.primary-btn:hover{
+    background:#096ea2;
+}
+
+.page{
     max-width:1200px;
-    margin:30px auto;
-    display:flex;
+    margin:20px auto;
+    display:grid;
+    grid-template-columns:1fr 300px;
     gap:20px;
-    padding:0 20px;
-    flex-wrap:wrap;
 }
 
-.left-column{
-    flex:1;
-    min-width:700px;
-}
-
-.invoice-panel,
-.history-panel,
-.payment-detail-panel{
+.card{
     background:white;
     border-radius:10px;
-    padding:20px;
-    box-shadow:0 2px 8px rgba(0,0,0,.1);
-    margin-bottom:20px;
+    padding:18px;
+    box-shadow:0 2px 8px rgba(0,0,0,.08);
 }
 
-.payment-detail-panel{
-    display:none;
-    border-left:5px solid #0094d9;
-}
-
-.summary-panel{
-    width:300px;
-    background:white;
-    border-radius:10px;
-    padding:20px;
-    box-shadow:0 2px 8px rgba(0,0,0,.1);
-    height:fit-content;
+.card h2{
+    margin-top:0;
 }
 
 table{
@@ -126,18 +107,90 @@ table{
     border-collapse:collapse;
 }
 
-th{
+th,td{
+    padding:10px;
+    border-bottom:1px solid #ddd;
     text-align:left;
-    border-bottom:2px solid #ddd;
-    padding:12px 8px;
-    font-size:13px;
-    color:#666;
+    font-size:14px;
 }
 
-td{
-    padding:12px 8px;
-    border-bottom:1px solid #eee;
-    font-size:14px;
+th{
+    background:#f4f4f4;
+}
+
+.status{
+    display:inline-block;
+    padding:4px 8px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:bold;
+}
+
+.status.sent{
+    background:#ffe7a3;
+    color:#8a5b00;
+}
+
+.status.overdue{
+    background:#ffd4d4;
+    color:#a10000;
+}
+
+.status.pending{
+    background:#dbe9ff;
+    color:#0b52b5;
+}
+
+.summary-box{
+    position:sticky;
+    top:20px;
+}
+
+.total-line{
+    display:flex;
+    justify-content:space-between;
+    margin:10px 0;
+}
+
+.pay-btn{
+    width:100%;
+    padding:14px;
+    background:#7fbf3f;
+    color:white;
+    font-size:16px;
+    font-weight:bold;
+}
+
+.pay-btn:hover{
+    background:#689d33;
+}
+
+.notice{
+    background:#e7f6e7;
+    border:1px solid #a6d8a8;
+    color:#236823;
+    padding:12px;
+    border-radius:8px;
+    margin-bottom:20px;
+}
+
+.hidden{
+    display:none;
+}
+
+.invoice-link{
+    display:inline-block;
+    background:#0d88c9;
+    color:white;
+    text-decoration:none;
+    padding:5px 10px;
+    border-radius:6px;
+    font-size:12px;
+    font-weight:bold;
+}
+
+.invoice-link:hover{
+    background:#096ea2;
 }
 
 .payment-row{
@@ -145,153 +198,55 @@ td{
 }
 
 .payment-row:hover{
-    background:#f1f8fc;
+    background:#f5f9fc;
 }
 
-.status{
-    padding:4px 8px;
-    border-radius:12px;
-    font-size:12px;
-    color:white;
-    display:inline-block;
-}
-
-.sent{
-    background:#ff9800;
-}
-
-.overdue{
-    background:#d32f2f;
-}
-
-.paid{
-    background:#2e7d32;
-}
-
-.total-box{
+.modal{
     margin-top:20px;
-    font-size:18px;
-    font-weight:bold;
-}
-
-.pay-btn{
-    width:100%;
-    margin-top:20px;
-    background:#8dc63f;
-    color:white;
-    border:none;
-    padding:14px;
-    border-radius:5px;
-    font-size:18px;
-    cursor:pointer;
-}
-
-.pay-btn:disabled{
-    opacity:.6;
-    cursor:not-allowed;
-}
-
-.close-btn{
-    background:#666;
-    color:white;
-    border:none;
-    border-radius:5px;
-    padding:8px 12px;
-    cursor:pointer;
-    float:right;
-}
-
-.error-box{
-    background:#ffebee;
-    border:1px solid #e57373;
-    color:#c62828;
-    padding:12px;
-    border-radius:6px;
-    margin-bottom:20px;
-    display:none;
-}
-
-.portal-message{
-    max-width:1200px;
-    margin:20px auto 0;
-    padding:0 20px;
-    display:none;
-}
-
-.portal-message-inner{
-    border-radius:8px;
-    padding:14px 16px;
-    font-size:15px;
-    box-shadow:0 2px 8px rgba(0,0,0,.08);
-}
-
-.portal-message.success .portal-message-inner{
-    background:#e8f5e9;
-    border:1px solid #81c784;
-    color:#1b5e20;
-}
-
-.portal-message.cancelled .portal-message-inner{
-    background:#fff8e1;
-    border:1px solid #ffcc80;
-    color:#7a4b00;
-}
-
-.small-note{
-    color:#666;
-    font-size:13px;
-    margin-top:-8px;
-    margin-bottom:16px;
+    border:2px solid #0d88c9;
 }
 
 .detail-grid{
     display:grid;
-    grid-template-columns:repeat(2,minmax(0,1fr));
+    grid-template-columns:1fr 1fr;
     gap:10px;
-    margin-bottom:18px;
+    margin-bottom:20px;
 }
 
 .detail-item{
-    background:#f7f7f7;
-    border-radius:6px;
+    background:#f4f4f4;
     padding:10px;
-    font-size:14px;
+    border-radius:6px;
 }
 
-.detail-label{
+.detail-item label{
+    display:block;
     font-size:12px;
     color:#666;
     margin-bottom:4px;
 }
 
-@media(max-width:800px){
-    .left-column,
-    .invoice-panel,
-    .history-panel,
-    .payment-detail-panel{
-        min-width:100%;
+.close-btn{
+    float:right;
+    background:#666;
+    color:white;
+    padding:5px 10px;
+    font-size:12px;
+}
+
+@media(max-width:900px){
+    .page{
+        grid-template-columns:1fr;
     }
 
-    .summary-panel{
-        width:100%;
-    }
-
-    .hero-text h1{
+    .portal-title h1{
         font-size:32px;
     }
 
     table{
-        min-width:650px;
-    }
-
-    .invoice-panel,
-    .history-panel,
-    .payment-detail-panel{
+        display:block;
         overflow-x:auto;
-    }
-
-    .detail-grid{
-        grid-template-columns:1fr;
+        white-space:nowrap;
     }
 }
 </style>
@@ -299,62 +254,63 @@ td{
 
 <body>
 
-<div class="topbar">
-1633 W Main Street, Suite 900, Lebanon, TN 37087 | print@ldrepro.com
-</div>
-
 <div class="hero">
     <div class="hero-inner">
-        <div class="hero-text">
+
+        <div class="portal-title">
             <h1>Lester Digital Payment Portal</h1>
             <p>Select multiple invoices and make one secure ACH or card payment.</p>
         </div>
 
-        <div class="lookup-box">
-            <h3>Your invoices</h3>
-            <input type="text" id="accessCode" readonly>
-            <button onclick="loadInvoices()">Refresh Invoices</button>
+        <div class="token-box">
+            <h3>Your Invoices</h3>
+
+            <input id="tokenInput" placeholder="Enter access token"/>
+
+            <button class="primary-btn" onclick="loadInvoices()">
+                Refresh Invoices
+            </button>
         </div>
+
     </div>
 </div>
 
-<div class="portal-message" id="portalMessage">
-    <div class="portal-message-inner" id="portalMessageInner"></div>
-</div>
+<div class="page">
 
-<div class="main">
+    <div>
 
-    <div class="left-column">
+        <div id="noticeArea"></div>
 
-        <div class="invoice-panel">
-            <div class="error-box" id="errorBox"></div>
-
+        <div class="card">
             <h2>Open Invoices</h2>
 
-            <table>
+            <table id="invoiceTable">
                 <thead>
                     <tr>
                         <th></th>
                         <th>Invoice</th>
-                        <th>Customer</th>
+                        <th>Job / PO</th>
                         <th>Due</th>
                         <th>Status</th>
-                        <th style="text-align:right;">Balance</th>
+                        <th>Balance</th>
+                        <th>View</th>
                     </tr>
                 </thead>
-                <tbody id="invoiceTable">
+
+                <tbody id="invoiceBody">
                     <tr>
-                        <td colspan="6">Loading invoices...</td>
+                        <td colspan="7">No invoices loaded.</td>
                     </tr>
                 </tbody>
             </table>
         </div>
 
-        <div class="history-panel">
+        <div class="card">
             <h2>Recent Payments</h2>
-            <div class="small-note">
+
+            <p style="font-size:12px;color:#666;">
                 Click a payment to view the invoices paid by that payment.
-            </div>
+            </p>
 
             <table>
                 <thead>
@@ -363,361 +319,258 @@ td{
                         <th>Payment #</th>
                         <th>Method</th>
                         <th>Reference</th>
-                        <th style="text-align:right;">Amount</th>
+                        <th>Amount</th>
                     </tr>
                 </thead>
-                <tbody id="paymentHistoryTable">
+
+                <tbody id="paymentBody">
                     <tr>
-                        <td colspan="5">Loading payment history...</td>
+                        <td colspan="5">No recent payments found.</td>
                     </tr>
                 </tbody>
             </table>
         </div>
 
-        <div class="payment-detail-panel" id="paymentDetailPanel">
-            <button class="close-btn" onclick="closePaymentDetail()">Close</button>
-            <h2>Payment Details</h2>
-
-            <div id="paymentDetailContent">
-                Loading payment detail...
-            </div>
-        </div>
+        <div id="paymentDetailModal" class="card modal hidden"></div>
 
     </div>
 
-    <div class="summary-panel">
-        <h3>Payment Summary</h3>
+    <div>
 
-        <div>
-            Selected Invoices:
-            <span id="selectedCount">0</span>
+        <div class="card summary-box">
+
+            <h3>Payment Summary</h3>
+
+            <div class="total-line">
+                <span>Selected Invoices:</span>
+                <strong id="selectedCount">0</strong>
+            </div>
+
+            <div class="total-line">
+                <span>Invoice Total:</span>
+                <strong id="invoiceTotal">$0.00</strong>
+            </div>
+
+            <div class="total-line">
+                <span>ACH Fee:</span>
+                <strong>$0.00</strong>
+            </div>
+
+            <hr/>
+
+            <div class="total-line" style="font-size:20px;">
+                <span>Total:</span>
+                <strong id="grandTotal">$0.00</strong>
+            </div>
+
+            <button class="pay-btn" onclick="beginPayment()">
+                Continue to Payment
+            </button>
+
         </div>
 
-        <div style="margin-top:10px;">
-            Invoice Total:
-            <span id="invoiceTotal">$0.00</span>
-        </div>
-
-        <div style="margin-top:10px;">
-            ACH Fee:
-            <span>$0.00</span>
-        </div>
-
-        <div class="total-box">
-            Total:
-            <span id="grandTotal">$0.00</span>
-        </div>
-
-        <button
-            class="pay-btn"
-            id="payButton"
-            onclick="continueToPayment()"
-        >
-            Continue to Payment
-        </button>
     </div>
 
 </div>
 
 <script>
-let invoices = [];
-let paymentHistory = [];
 
 const API_BASE = "https://ldr-payment-api.ldrpzl3672.workers.dev";
 
-const urlParams = new URLSearchParams(window.location.search);
-const token = urlParams.get("token");
-const paymentStatus = urlParams.get("payment");
+let currentInvoices = [];
+let selectedInvoices = [];
 
-document.getElementById("accessCode").value = token || "Missing payment token";
+function money(v){
+    return "$" + Number(v || 0).toFixed(2);
+}
 
-window.addEventListener("DOMContentLoaded", () => {
-    showPaymentStatusMessage();
-
-    if (token) {
-        loadInvoices();
-    } else {
-        showError("Missing payment access token.");
-    }
-});
-
-function showPaymentStatusMessage(){
-
-    const messageBox = document.getElementById("portalMessage");
-    const messageInner = document.getElementById("portalMessageInner");
-
-    if (!paymentStatus) {
-        return;
-    }
-
-    if (paymentStatus === "success") {
-        messageBox.className = "portal-message success";
-        messageBox.style.display = "block";
-        messageInner.innerHTML = `
-            <strong>Payment submitted successfully.</strong><br>
-            Your payment was received by Stripe. Paid invoices may take a moment to disappear from this portal and appear in recent payments.
-        `;
-        return;
-    }
-
-    if (paymentStatus === "cancelled") {
-        messageBox.className = "portal-message cancelled";
-        messageBox.style.display = "block";
-        messageInner.innerHTML = `
-            <strong>Payment was cancelled.</strong><br>
-            No payment was made. You can adjust your invoice selection and try again.
-        `;
-    }
+function showNotice(message){
+    document.getElementById("noticeArea").innerHTML = `
+        <div class="notice">${message}</div>
+    `;
 }
 
 async function loadInvoices(){
 
-    const errorBox = document.getElementById("errorBox");
-    errorBox.style.display = "none";
+    const token = document.getElementById("tokenInput").value.trim();
 
-    if (!token) {
-        showError("Missing payment access token.");
+    if(!token){
+        alert("Enter access token.");
         return;
     }
 
-    try {
+    localStorage.setItem("portalToken", token);
 
-        const response = await fetch(
-            `${API_BASE}/api/invoices?token=${encodeURIComponent(token)}`
-        );
+    const response = await fetch(
+        `${API_BASE}/api/invoices?token=${encodeURIComponent(token)}`
+    );
 
-        const data = await response.json();
+    const data = await response.json();
 
-        if (data.error) {
-            showError(data.error);
-            return;
-        }
+    currentInvoices = data.invoices || [];
 
-        invoices = data.invoices || [];
-        paymentHistory = data.payment_history || [];
+    renderInvoices();
 
-        renderInvoices();
-        renderPaymentHistory();
+    renderPayments(data.payment_history || []);
 
-    } catch (err) {
-        console.error(err);
-        showError("Unable to load invoices.");
-    }
+    updateSummary();
 }
 
 function renderInvoices(){
 
-    const table = document.getElementById("invoiceTable");
+    const body = document.getElementById("invoiceBody");
 
-    table.innerHTML = "";
-
-    if (invoices.length === 0) {
-
-        table.innerHTML = `
+    if(currentInvoices.length === 0){
+        body.innerHTML = `
             <tr>
-                <td colspan="6">No open invoices found.</td>
+                <td colspan="7">No open invoices found.</td>
             </tr>
         `;
-
-        updateTotals();
-
         return;
     }
 
-    invoices.forEach(invoice => {
-
-        const tr = document.createElement("tr");
+    body.innerHTML = currentInvoices.map(invoice => {
 
         const statusClass =
             invoice.status === "overdue"
-            ? "overdue"
-            : "sent";
+                ? "overdue"
+                : invoice.status === "pending"
+                    ? "pending"
+                    : "sent";
 
-        tr.innerHTML = `
-            <td>
-                <input
-                    type="checkbox"
-                    onchange="updateTotals()"
-                    data-id="${escapeHtml(invoice.invoice_id)}"
-                    data-balance="${Number(invoice.balance)}"
-                >
-            </td>
+        return `
+            <tr>
 
-            <td>
-                <strong>${escapeHtml(invoice.invoice_number)}</strong>
-            </td>
+                <td>
+                    <input
+                        type="checkbox"
+                        onchange="toggleInvoice('${invoice.invoice_id}')"
+                    />
+                </td>
 
-            <td>
-                ${escapeHtml(invoice.customer_name)}
-            </td>
+                <td>${invoice.invoice_number}</td>
 
-            <td>
-                ${escapeHtml(invoice.due_date)}
-            </td>
+                <td>
+                    ${invoice.job_label || "-"}
+                </td>
 
-            <td>
-                <span class="status ${statusClass}">
-                    ${escapeHtml(invoice.status)}
-                </span>
-            </td>
+                <td>${invoice.due_date || "-"}</td>
 
-            <td style="text-align:right;">
-                $${Number(invoice.balance).toFixed(2)}
-            </td>
+                <td>
+                    <span class="status ${statusClass}">
+                        ${invoice.status_formatted || invoice.status}
+                    </span>
+                </td>
+
+                <td>${money(invoice.balance)}</td>
+
+                <td>
+                    ${
+                        invoice.invoice_url
+                        ? `
+                            <a
+                                class="invoice-link"
+                                href="${invoice.invoice_url}"
+                                target="_blank"
+                            >
+                                View
+                            </a>
+                          `
+                        : "-"
+                    }
+                </td>
+
+            </tr>
         `;
-
-        table.appendChild(tr);
-    });
-
-    updateTotals();
+    }).join("");
 }
 
-function renderPaymentHistory(){
+function renderPayments(payments){
 
-    const table = document.getElementById("paymentHistoryTable");
+    const body = document.getElementById("paymentBody");
 
-    table.innerHTML = "";
-
-    if (!paymentHistory || paymentHistory.length === 0) {
-
-        table.innerHTML = `
+    if(payments.length === 0){
+        body.innerHTML = `
             <tr>
                 <td colspan="5">No recent payments found.</td>
             </tr>
         `;
-
         return;
     }
 
-    paymentHistory.forEach(payment => {
-
-        const tr = document.createElement("tr");
-        tr.className = "payment-row";
-        tr.onclick = () => loadPaymentDetail(payment.payment_id);
-
-        tr.innerHTML = `
-            <td>${escapeHtml(payment.date || "")}</td>
-
-            <td>
-                <strong>${escapeHtml(payment.payment_number || "")}</strong>
-            </td>
-
-            <td>${escapeHtml(payment.payment_mode || "")}</td>
-
-            <td>${escapeHtml(payment.reference_number || "")}</td>
-
-            <td style="text-align:right;">
-                $${Number(payment.amount || 0).toFixed(2)}
-            </td>
-        `;
-
-        table.appendChild(tr);
-    });
+    body.innerHTML = payments.map(payment => `
+        <tr
+            class="payment-row"
+            onclick="loadPaymentDetail('${payment.payment_id}')"
+        >
+            <td>${payment.date}</td>
+            <td>${payment.payment_number}</td>
+            <td>${payment.payment_mode}</td>
+            <td>${payment.reference_number}</td>
+            <td>${money(payment.amount)}</td>
+        </tr>
+    `).join("");
 }
 
 async function loadPaymentDetail(paymentId){
 
-    const panel = document.getElementById("paymentDetailPanel");
-    const content = document.getElementById("paymentDetailContent");
+    const token = document.getElementById("tokenInput").value.trim();
 
-    panel.style.display = "block";
-    content.innerHTML = "Loading payment detail...";
+    const response = await fetch(
+        `${API_BASE}/api/payment-detail?token=${encodeURIComponent(token)}&paymentId=${encodeURIComponent(paymentId)}`
+    );
 
-    try {
+    const data = await response.json();
 
-        const response = await fetch(
-            `${API_BASE}/api/payment-detail?token=${encodeURIComponent(token)}&paymentId=${encodeURIComponent(paymentId)}`
-        );
-
-        const data = await response.json();
-
-        if (!response.ok || data.error) {
-            content.innerHTML = `
-                <div class="error-box" style="display:block;">
-                    ${escapeHtml(data.error || "Unable to load payment detail.")}
-                </div>
-            `;
-            return;
-        }
-
-        renderPaymentDetail(data.payment);
-
-        panel.scrollIntoView({
-            behavior: "smooth",
-            block: "start"
-        });
-
-    } catch (err) {
-
-        console.error(err);
-
-        content.innerHTML = `
-            <div class="error-box" style="display:block;">
-                Unable to load payment detail.
-            </div>
-        `;
-    }
-}
-
-function renderPaymentDetail(payment){
-
-    const content = document.getElementById("paymentDetailContent");
-
-    const invoicesPaid = payment.invoices || [];
-
-    let invoiceRows = "";
-
-    if (invoicesPaid.length === 0) {
-        invoiceRows = `
-            <tr>
-                <td colspan="5">No invoice detail found for this payment.</td>
-            </tr>
-        `;
-    } else {
-        invoicesPaid.forEach(invoice => {
-            invoiceRows += `
-                <tr>
-                    <td><strong>${escapeHtml(invoice.invoice_number || "")}</strong></td>
-                    <td>${escapeHtml(invoice.date || "")}</td>
-                    <td style="text-align:right;">$${Number(invoice.total || 0).toFixed(2)}</td>
-                    <td style="text-align:right;">$${Number(invoice.amount_applied || 0).toFixed(2)}</td>
-                    <td style="text-align:right;">$${Number(invoice.balance || 0).toFixed(2)}</td>
-                </tr>
-            `;
-        });
+    if(!data.payment){
+        return;
     }
 
-    content.innerHTML = `
+    const payment = data.payment;
+
+    const modal = document.getElementById("paymentDetailModal");
+
+    modal.classList.remove("hidden");
+
+    modal.innerHTML = `
+        <button class="close-btn" onclick="closePaymentDetail()">
+            Close
+        </button>
+
+        <h2>Payment Details</h2>
+
         <div class="detail-grid">
+
             <div class="detail-item">
-                <div class="detail-label">Payment #</div>
-                <strong>${escapeHtml(payment.payment_number || "")}</strong>
+                <label>Payment #</label>
+                ${payment.payment_number}
             </div>
 
             <div class="detail-item">
-                <div class="detail-label">Date</div>
-                <strong>${escapeHtml(payment.date || "")}</strong>
+                <label>Date</label>
+                ${payment.date}
             </div>
 
             <div class="detail-item">
-                <div class="detail-label">Method</div>
-                <strong>${escapeHtml(payment.payment_mode || "")}</strong>
+                <label>Method</label>
+                ${payment.payment_mode}
             </div>
 
             <div class="detail-item">
-                <div class="detail-label">Reference</div>
-                <strong>${escapeHtml(payment.reference_number || "")}</strong>
+                <label>Reference</label>
+                ${payment.reference_number}
             </div>
 
             <div class="detail-item">
-                <div class="detail-label">Customer</div>
-                <strong>${escapeHtml(payment.customer_name || "")}</strong>
+                <label>Customer</label>
+                ${payment.customer_name}
             </div>
 
             <div class="detail-item">
-                <div class="detail-label">Total Payment</div>
-                <strong>$${Number(payment.amount || 0).toFixed(2)}</strong>
+                <label>Total Payment</label>
+                ${money(payment.amount)}
             </div>
+
         </div>
 
         <h3>Invoices Paid</h3>
@@ -727,138 +580,122 @@ function renderPaymentDetail(payment){
                 <tr>
                     <th>Invoice</th>
                     <th>Date</th>
-                    <th style="text-align:right;">Invoice Total</th>
-                    <th style="text-align:right;">Amount Applied</th>
-                    <th style="text-align:right;">Balance</th>
+                    <th>Invoice Total</th>
+                    <th>Amount Applied</th>
+                    <th>Balance</th>
                 </tr>
             </thead>
+
             <tbody>
-                ${invoiceRows}
+
+                ${payment.invoices.map(invoice => `
+                    <tr>
+                        <td>${invoice.invoice_number}</td>
+                        <td>${invoice.date}</td>
+                        <td>${money(invoice.total)}</td>
+                        <td>${money(invoice.amount_applied)}</td>
+                        <td>${money(invoice.balance)}</td>
+                    </tr>
+                `).join("")}
+
             </tbody>
         </table>
     `;
 }
 
 function closePaymentDetail(){
-    document.getElementById("paymentDetailPanel").style.display = "none";
+    document.getElementById("paymentDetailModal").classList.add("hidden");
 }
 
-function updateTotals(){
+function toggleInvoice(invoiceId){
 
-    const checks = document.querySelectorAll(
-        'input[type="checkbox"]:checked'
-    );
+    const invoice = currentInvoices.find(i => i.invoice_id === invoiceId);
 
-    let total = 0;
+    if(!invoice) return;
 
-    checks.forEach(check => {
-        total += Number(check.dataset.balance);
-    });
+    const exists = selectedInvoices.find(i => i.invoice_id === invoiceId);
+
+    if(exists){
+        selectedInvoices =
+            selectedInvoices.filter(i => i.invoice_id !== invoiceId);
+    } else {
+        selectedInvoices.push(invoice);
+    }
+
+    updateSummary();
+}
+
+function updateSummary(){
+
+    const total = selectedInvoices.reduce((sum, invoice) => {
+        return sum + Number(invoice.balance || 0);
+    }, 0);
 
     document.getElementById("selectedCount").innerText =
-        checks.length;
+        selectedInvoices.length;
 
     document.getElementById("invoiceTotal").innerText =
-        `$${total.toFixed(2)}`;
+        money(total);
 
     document.getElementById("grandTotal").innerText =
-        `$${total.toFixed(2)}`;
+        money(total);
 }
 
-async function continueToPayment(){
+async function beginPayment(){
 
-    const button = document.getElementById("payButton");
-
-    const checks = document.querySelectorAll(
-        'input[type="checkbox"]:checked'
-    );
-
-    if (checks.length === 0) {
-
-        showError("Please select at least one invoice.");
-
+    if(selectedInvoices.length === 0){
+        alert("Select at least one invoice.");
         return;
     }
 
-    button.disabled = true;
-    button.innerText = "Creating Secure Checkout...";
+    const token = document.getElementById("tokenInput").value.trim();
 
-    try {
+    const amount = selectedInvoices.reduce((sum, invoice) => {
+        return sum + Number(invoice.balance || 0);
+    }, 0);
 
-        let total = 0;
-
-        const invoiceIds = [];
-
-        checks.forEach(check => {
-
-            total += Number(check.dataset.balance);
-
-            invoiceIds.push(check.dataset.id);
-        });
-
-        const response = await fetch(
-            `${API_BASE}/api/create-checkout-session`,
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    token,
-                    invoiceIds,
-                    amount: total
-                })
-            }
-        );
-
-        const data = await response.json();
-
-        if (!response.ok || data.error) {
-
-            console.error(data);
-
-            showError(
-                "Unable to create payment session."
-            );
-
-            button.disabled = false;
-            button.innerText = "Continue to Payment";
-
-            return;
+    const response = await fetch(
+        `${API_BASE}/api/create-checkout-session`,
+        {
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({
+                token,
+                amount,
+                invoiceIds:selectedInvoices.map(i => i.invoice_id)
+            })
         }
+    );
 
+    const data = await response.json();
+
+    if(data.checkoutUrl){
         window.location.href = data.checkoutUrl;
-
-    } catch (err) {
-
-        console.error(err);
-
-        showError(
-            "Unable to connect to payment system."
-        );
-
-        button.disabled = false;
-        button.innerText = "Continue to Payment";
+    } else {
+        alert("Unable to start payment.");
+        console.log(data);
     }
 }
 
-function showError(message){
+const params = new URLSearchParams(window.location.search);
 
-    const errorBox = document.getElementById("errorBox");
+const paymentStatus = params.get("payment");
 
-    errorBox.style.display = "block";
-
-    errorBox.innerText = message;
+if(paymentStatus === "success"){
+    showNotice(
+        "Payment submitted successfully.<br>Your payment was received by Stripe. ACH payments may take a few minutes to appear in recent payments."
+    );
 }
 
-function escapeHtml(value){
-    return String(value ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
+const savedToken = localStorage.getItem("portalToken");
+
+if(savedToken){
+    document.getElementById("tokenInput").value = savedToken;
+    loadInvoices();
 }
+
 </script>
 
 </body>
