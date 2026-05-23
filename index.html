@@ -6,283 +6,50 @@
 <title>Lester Digital Payment Portal</title>
 
 <style>
-body{
-    margin:0;
-    font-family:Arial,Helvetica,sans-serif;
-    background:#f4f4f4;
-    color:#222;
-}
-
-.topbar{
-    background:#0094d9;
-    color:white;
-    text-align:center;
-    padding:8px;
-    font-size:12px;
-    border-bottom:3px solid #8dc63f;
-}
-
-.hero{
-    background:
-        linear-gradient(rgba(255,255,255,.80),rgba(255,255,255,.80)),
-        url('https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=1800&auto=format&fit=crop') center/cover;
-    padding:70px 20px;
-    border-bottom:4px solid #8dc63f;
-}
-
-.hero-inner{
-    max-width:1200px;
-    margin:auto;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:20px;
-    flex-wrap:wrap;
-}
-
-.hero-text h1{
-    margin:0;
-    font-size:42px;
-}
-
-.hero-text p{
-    margin-top:10px;
-    font-size:18px;
-}
-
-.lookup-box{
-    background:white;
-    padding:20px;
-    border-radius:10px;
-    width:320px;
-    box-shadow:0 4px 12px rgba(0,0,0,.15);
-}
-
-.lookup-box h3{
-    margin-top:0;
-    color:#0094d9;
-}
-
-.lookup-box input{
-    width:100%;
-    padding:12px;
-    border:1px solid #ccc;
-    border-radius:5px;
-    margin-bottom:12px;
-    box-sizing:border-box;
-}
-
-.lookup-box button{
-    width:100%;
-    background:#0094d9;
-    color:white;
-    border:none;
-    padding:12px;
-    border-radius:5px;
-    cursor:pointer;
-    font-size:16px;
-}
-
-.main{
-    max-width:1200px;
-    margin:30px auto;
-    display:flex;
-    gap:20px;
-    padding:0 20px;
-    flex-wrap:wrap;
-}
-
-.left-column{
-    flex:1;
-    min-width:700px;
-}
-
-.invoice-panel,
-.history-panel,
-.invoice-detail-panel,
-.payment-detail-panel{
-    background:white;
-    border-radius:10px;
-    padding:20px;
-    box-shadow:0 2px 8px rgba(0,0,0,.1);
-    margin-bottom:20px;
-}
-
-.invoice-detail-panel,
-.payment-detail-panel{
-    display:none;
-    border-left:5px solid #0094d9;
-}
-
-.summary-panel{
-    width:300px;
-    background:white;
-    border-radius:10px;
-    padding:20px;
-    box-shadow:0 2px 8px rgba(0,0,0,.1);
-    height:fit-content;
-}
-
-table{
-    width:100%;
-    border-collapse:collapse;
-}
-
-th{
-    text-align:left;
-    border-bottom:2px solid #ddd;
-    padding:12px 8px;
-    font-size:13px;
-    color:#666;
-}
-
-td{
-    padding:12px 8px;
-    border-bottom:1px solid #eee;
-    font-size:14px;
-}
-
-.status{
-    padding:4px 8px;
-    border-radius:12px;
-    font-size:12px;
-    color:white;
-    display:inline-block;
-}
-
-.sent{
-    background:#ff9800;
-}
-
-.overdue{
-    background:#d32f2f;
-}
-
-.pending{
-    background:#1976d2;
-}
-
-.total-box{
-    margin-top:20px;
-    font-size:18px;
-    font-weight:bold;
-}
-
-.pay-btn{
-    width:100%;
-    margin-top:20px;
-    background:#8dc63f;
-    color:white;
-    border:none;
-    padding:14px;
-    border-radius:5px;
-    font-size:18px;
-    cursor:pointer;
-}
-
-.detail-btn{
-    background:#0094d9;
-    color:white;
-    border:none;
-    padding:6px 10px;
-    border-radius:5px;
-    cursor:pointer;
-    font-size:12px;
-}
-
-.close-btn{
-    background:#666;
-    color:white;
-    border:none;
-    border-radius:5px;
-    padding:8px 12px;
-    cursor:pointer;
-    float:right;
-}
-
-.detail-grid{
-    display:grid;
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:10px;
-    margin-bottom:18px;
-}
-
-.detail-item{
-    background:#f7f7f7;
-    border-radius:6px;
-    padding:10px;
-    font-size:14px;
-}
-
-.detail-label{
-    font-size:12px;
-    color:#666;
-    margin-bottom:4px;
-}
-
-.note-box{
-    background:#f9f9f9;
-    border-left:4px solid #0094d9;
-    padding:12px;
-    margin-top:15px;
-    border-radius:6px;
-}
-
-.payment-row{
-    cursor:pointer;
-}
-
-.payment-row:hover{
-    background:#f3f9fc;
-}
-
-.portal-message{
-    max-width:1200px;
-    margin:20px auto 0;
-    padding:0 20px;
-}
-
-.portal-message-inner{
-    border-radius:8px;
-    padding:14px 16px;
-}
-
-.success{
-    background:#e8f5e9;
-    border:1px solid #81c784;
-    color:#1b5e20;
-}
-
-.cancelled{
-    background:#fff8e1;
-    border:1px solid #ffcc80;
-    color:#7a4b00;
-}
-
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f4f4f4;color:#222;}
+.topbar{background:#0094d9;color:white;text-align:center;padding:8px;font-size:12px;border-bottom:3px solid #8dc63f;}
+.hero{background:linear-gradient(rgba(255,255,255,.80),rgba(255,255,255,.80)),url('https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=1800&auto=format&fit=crop') center/cover;padding:70px 20px;border-bottom:4px solid #8dc63f;}
+.hero-inner{max-width:1200px;margin:auto;display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;}
+.hero-text h1{margin:0;font-size:42px;}
+.hero-text p{margin-top:10px;font-size:18px;}
+.lookup-box{background:white;padding:20px;border-radius:10px;width:320px;box-shadow:0 4px 12px rgba(0,0,0,.15);}
+.lookup-box h3{margin-top:0;color:#0094d9;}
+.lookup-box input{width:100%;padding:12px;border:1px solid #ccc;border-radius:5px;margin-bottom:12px;box-sizing:border-box;}
+.lookup-box button{width:100%;background:#0094d9;color:white;border:none;padding:12px;border-radius:5px;cursor:pointer;font-size:16px;}
+.main{max-width:1200px;margin:30px auto;display:flex;gap:20px;padding:0 20px;flex-wrap:wrap;}
+.left-column{flex:1;min-width:700px;}
+.invoice-panel,.history-panel,.invoice-detail-panel,.payment-detail-panel{background:white;border-radius:10px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.1);margin-bottom:20px;}
+.invoice-detail-panel,.payment-detail-panel{display:none;border-left:5px solid #0094d9;}
+.summary-panel{width:300px;background:white;border-radius:10px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.1);height:fit-content;}
+table{width:100%;border-collapse:collapse;}
+th{text-align:left;border-bottom:2px solid #ddd;padding:12px 8px;font-size:13px;color:#666;}
+td{padding:12px 8px;border-bottom:1px solid #eee;font-size:14px;}
+.status{padding:4px 8px;border-radius:12px;font-size:12px;color:white;display:inline-block;}
+.sent{background:#ff9800;}
+.overdue{background:#d32f2f;}
+.pending{background:#1976d2;}
+.total-box{margin-top:20px;font-size:18px;font-weight:bold;}
+.pay-btn{width:100%;margin-top:20px;background:#8dc63f;color:white;border:none;padding:14px;border-radius:5px;font-size:18px;cursor:pointer;}
+.detail-btn{background:#0094d9;color:white;border:none;padding:6px 10px;border-radius:5px;cursor:pointer;font-size:12px;}
+.detail-btn:disabled{opacity:.55;cursor:not-allowed;}
+.close-btn{background:#666;color:white;border:none;border-radius:5px;padding:8px 12px;cursor:pointer;float:right;}
+.detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:18px;}
+.detail-item{background:#f7f7f7;border-radius:6px;padding:10px;font-size:14px;}
+.detail-label{font-size:12px;color:#666;margin-bottom:4px;}
+.note-box{background:#f9f9f9;border-left:4px solid #0094d9;padding:12px;margin-top:15px;border-radius:6px;}
+.payment-row{cursor:pointer;}
+.payment-row:hover{background:#f3f9fc;}
+.portal-message{max-width:1200px;margin:20px auto 0;padding:0 20px;}
+.portal-message-inner{border-radius:8px;padding:14px 16px;}
+.success{background:#e8f5e9;border:1px solid #81c784;color:#1b5e20;}
+.cancelled{background:#fff8e1;border:1px solid #ffcc80;color:#7a4b00;}
+.error-message{background:#ffebee;border:1px solid #e57373;color:#c62828;padding:12px;border-radius:6px;}
 @media(max-width:800px){
-
-    .left-column{
-        min-width:100%;
-    }
-
-    .summary-panel{
-        width:100%;
-    }
-
-    .invoice-panel,
-    .history-panel,
-    .invoice-detail-panel,
-    .payment-detail-panel{
-        overflow-x:auto;
-    }
-
-    table{
-        min-width:850px;
-    }
-
-    .detail-grid{
-        grid-template-columns:1fr;
-    }
+.left-column{min-width:100%;}
+.summary-panel{width:100%;}
+.invoice-panel,.history-panel,.invoice-detail-panel,.payment-detail-panel{overflow-x:auto;}
+table{min-width:850px;}
+.detail-grid{grid-template-columns:1fr;}
 }
 </style>
 </head>
@@ -295,7 +62,6 @@ td{
 
 <div class="hero">
     <div class="hero-inner">
-
         <div class="hero-text">
             <h1>Lester Digital Payment Portal</h1>
             <p>Select multiple invoices and make one secure ACH or card payment.</p>
@@ -306,7 +72,6 @@ td{
             <input type="text" id="accessCode" readonly>
             <button onclick="loadInvoices()">Refresh Invoices</button>
         </div>
-
     </div>
 </div>
 
@@ -317,7 +82,6 @@ td{
 <div class="left-column">
 
 <div class="invoice-panel">
-
 <h2>Open Invoices</h2>
 
 <table>
@@ -332,33 +96,21 @@ td{
 <th>Details</th>
 </tr>
 </thead>
-
 <tbody id="invoiceTable">
-<tr>
-<td colspan="7">Loading invoices...</td>
-</tr>
+<tr><td colspan="7">Loading invoices...</td></tr>
 </tbody>
 </table>
-
 </div>
 
 <div class="invoice-detail-panel" id="invoiceDetailPanel">
 <button class="close-btn" onclick="closeInvoiceDetail()">Close</button>
-
 <h2>Invoice Details</h2>
-
-<div id="invoiceDetailContent">
-Loading invoice detail...
-</div>
+<div id="invoiceDetailContent">Loading invoice detail...</div>
 </div>
 
 <div class="history-panel">
-
 <h2>Recent Payments</h2>
-
-<p style="font-size:13px;color:#666;">
-Click a payment to view invoices included in that payment.
-</p>
+<p style="font-size:13px;color:#666;">Click a payment to view invoices included in that payment.</p>
 
 <table>
 <thead>
@@ -370,83 +122,52 @@ Click a payment to view invoices included in that payment.
 <th style="text-align:right;">Amount</th>
 </tr>
 </thead>
-
 <tbody id="paymentHistoryTable">
-<tr>
-<td colspan="5">Loading payment history...</td>
-</tr>
+<tr><td colspan="5">Loading payment history...</td></tr>
 </tbody>
 </table>
-
 </div>
 
 <div class="payment-detail-panel" id="paymentDetailPanel">
-
 <button class="close-btn" onclick="closePaymentDetail()">Close</button>
-
 <h2>Payment Details</h2>
-
-<div id="paymentDetailContent">
-Loading payment detail...
-</div>
-
+<div id="paymentDetailContent">Loading payment detail...</div>
 </div>
 
 </div>
 
 <div class="summary-panel">
-
 <h3>Payment Summary</h3>
 
-<div>
-Selected Invoices:
-<span id="selectedCount">0</span>
-</div>
-
-<div style="margin-top:10px;">
-Invoice Total:
-<span id="invoiceTotal">$0.00</span>
-</div>
-
-<div style="margin-top:10px;">
-ACH Fee:
-<span>$0.00</span>
-</div>
+<div>Selected Invoices: <span id="selectedCount">0</span></div>
+<div style="margin-top:10px;">Invoice Total: <span id="invoiceTotal">$0.00</span></div>
+<div style="margin-top:10px;">ACH Fee: <span>$0.00</span></div>
 
 <div class="total-box">
-Total:
-<span id="grandTotal">$0.00</span>
+Total: <span id="grandTotal">$0.00</span>
 </div>
 
-<button
-class="pay-btn"
-id="payButton"
-onclick="continueToPayment()"
->
-Continue to Payment
-</button>
-
+<button class="pay-btn" id="payButton" onclick="continueToPayment()">Continue to Payment</button>
 </div>
 
 </div>
 
 <script>
-
 const API_BASE = "https://ldr-payment-api.ldrpzl3672.workers.dev";
 
 let invoices = [];
 let paymentHistory = [];
 
-const urlParams = new URLSearchParams(window.location.search);
+let activeInvoiceDetailRequest = 0;
+let activePaymentDetailRequest = 0;
 
+const urlParams = new URLSearchParams(window.location.search);
 const token = urlParams.get("token");
 const paymentStatus = urlParams.get("payment");
 
-document.getElementById("accessCode").value =
-    token || "Missing payment token";
+document.getElementById("accessCode").value = token || "Missing payment token";
 
 window.addEventListener("DOMContentLoaded", () => {
-
     showPaymentStatus();
 
     if(token){
@@ -455,7 +176,6 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 function showPaymentStatus(){
-
     if(!paymentStatus){
         return;
     }
@@ -463,19 +183,16 @@ function showPaymentStatus(){
     const box = document.getElementById("portalMessage");
 
     if(paymentStatus === "success"){
-
         box.innerHTML = `
             <div class="portal-message-inner success">
                 <strong>Payment submitted successfully.</strong><br>
                 ACH payments may take a few minutes to appear.
             </div>
         `;
-
         return;
     }
 
     if(paymentStatus === "cancelled"){
-
         box.innerHTML = `
             <div class="portal-message-inner cancelled">
                 <strong>Payment cancelled.</strong><br>
@@ -486,39 +203,68 @@ function showPaymentStatus(){
 }
 
 async function loadInvoices(){
+    const invoiceTable = document.getElementById("invoiceTable");
+    const paymentTable = document.getElementById("paymentHistoryTable");
 
-    const response = await fetch(
-        `${API_BASE}/api/invoices?token=${encodeURIComponent(token)}`
-    );
+    invoiceTable.innerHTML = `<tr><td colspan="7">Loading invoices...</td></tr>`;
+    paymentTable.innerHTML = `<tr><td colspan="5">Loading payment history...</td></tr>`;
 
-    const data = await response.json();
+    try {
+        const response = await fetch(
+            `${API_BASE}/api/invoices?token=${encodeURIComponent(token)}`
+        );
 
-    invoices = data.invoices || [];
-    paymentHistory = data.payment_history || [];
+        const data = await response.json();
 
-    renderInvoices();
-    renderPaymentHistory();
-}
+        if(!response.ok || data.error){
+            invoiceTable.innerHTML = `
+                <tr>
+                    <td colspan="7">
+                        <div class="error-message">
+                            ${escapeHtml(data.error || "Unable to load invoices.")}
+                        </div>
+                    </td>
+                </tr>
+            `;
+            paymentTable.innerHTML = `<tr><td colspan="5">Payment history unavailable.</td></tr>`;
+            return;
+        }
 
-function renderInvoices(){
+        invoices = data.invoices || [];
+        paymentHistory = data.payment_history || [];
 
-    const table = document.getElementById("invoiceTable");
+        renderInvoices();
+        renderPaymentHistory();
+        updateTotals();
 
-    if(invoices.length === 0){
+    } catch(error){
+        console.error(error);
 
-        table.innerHTML = `
+        invoiceTable.innerHTML = `
             <tr>
-                <td colspan="7">No open invoices found.</td>
+                <td colspan="7">
+                    <div class="error-message">
+                        Unable to load invoices. Please refresh and try again.
+                    </div>
+                </td>
             </tr>
         `;
 
+        paymentTable.innerHTML = `<tr><td colspan="5">Payment history unavailable.</td></tr>`;
+    }
+}
+
+function renderInvoices(){
+    const table = document.getElementById("invoiceTable");
+
+    if(invoices.length === 0){
+        table.innerHTML = `<tr><td colspan="7">No open invoices found.</td></tr>`;
         return;
     }
 
     table.innerHTML = "";
 
     invoices.forEach(invoice => {
-
         const row = document.createElement("tr");
 
         const statusClass =
@@ -546,17 +292,10 @@ function renderInvoices(){
             </td>
 
             <td>
-                ${escapeHtml(
-                    invoice.job_label ||
-                    invoice.reference_number ||
-                    invoice.project_name ||
-                    "-"
-                )}
+                ${escapeHtml(invoice.job_label || invoice.reference_number || invoice.project_name || "-")}
             </td>
 
-            <td>
-                ${escapeHtml(invoice.due_date || "")}
-            </td>
+            <td>${escapeHtml(invoice.due_date || "")}</td>
 
             <td>
                 <span class="status ${statusClass}">
@@ -571,6 +310,7 @@ function renderInvoices(){
             <td>
                 <button
                     class="detail-btn"
+                    data-invoice-detail-button="true"
                     onclick="loadInvoiceDetail('${escapeHtml(invoice.invoice_id)}')"
                 >
                     Details
@@ -580,83 +320,91 @@ function renderInvoices(){
 
         table.appendChild(row);
     });
-
-    updateTotals();
 }
 
 async function loadInvoiceDetail(invoiceId){
+    const requestId = ++activeInvoiceDetailRequest;
 
     const panel = document.getElementById("invoiceDetailPanel");
     const content = document.getElementById("invoiceDetailContent");
 
-    panel.style.display = "block";
+    document.getElementById("paymentDetailPanel").style.display = "none";
 
+    panel.style.display = "block";
     content.innerHTML = "Loading invoice detail...";
 
-    const response = await fetch(
-        `${API_BASE}/api/invoice-detail?token=${encodeURIComponent(token)}&invoiceId=${encodeURIComponent(invoiceId)}`
-    );
+    setDetailButtonsDisabled(true);
 
-    const data = await response.json();
+    try {
+        const response = await fetch(
+            `${API_BASE}/api/invoice-detail?token=${encodeURIComponent(token)}&invoiceId=${encodeURIComponent(invoiceId)}`
+        );
 
-    if(!data.invoice){
+        if(requestId !== activeInvoiceDetailRequest){
+            return;
+        }
+
+        const data = await response.json();
+
+        if(!response.ok || !data.invoice){
+            content.innerHTML = `
+                <div class="error-message">
+                    ${escapeHtml(data.error || "Unable to load invoice detail.")}
+                </div>
+            `;
+            return;
+        }
+
+        renderInvoiceDetail(data.invoice);
+
+        panel.scrollIntoView({
+            behavior:"smooth",
+            block:"start"
+        });
+
+    } catch(error){
+        if(requestId !== activeInvoiceDetailRequest){
+            return;
+        }
+
+        console.error(error);
 
         content.innerHTML = `
-            Unable to load invoice detail.
+            <div class="error-message">
+                Unable to load invoice detail. Please try again.
+            </div>
         `;
 
-        return;
+    } finally {
+        if(requestId === activeInvoiceDetailRequest){
+            setDetailButtonsDisabled(false);
+        }
     }
-
-    renderInvoiceDetail(data.invoice);
-
-    panel.scrollIntoView({
-        behavior:"smooth",
-        block:"start"
-    });
 }
 
 function renderInvoiceDetail(invoice){
-
     const content = document.getElementById("invoiceDetailContent");
 
     let lineRows = "";
 
     if(invoice.line_items && invoice.line_items.length > 0){
-
         invoice.line_items.forEach(item => {
-
             lineRows += `
                 <tr>
                     <td>${escapeHtml(item.name || "")}</td>
                     <td>${escapeHtml(item.description || "")}</td>
-                    <td style="text-align:right;">
-                        ${Number(item.quantity || 0)}
-                    </td>
-                    <td style="text-align:right;">
-                        $${Number(item.rate || 0).toFixed(2)}
-                    </td>
-                    <td style="text-align:right;">
-                        $${Number(item.total || 0).toFixed(2)}
-                    </td>
+                    <td style="text-align:right;">${Number(item.quantity || 0)}</td>
+                    <td style="text-align:right;">$${Number(item.rate || 0).toFixed(2)}</td>
+                    <td style="text-align:right;">$${Number(item.total || 0).toFixed(2)}</td>
                 </tr>
             `;
         });
-
     } else {
-
-        lineRows = `
-            <tr>
-                <td colspan="5">
-                    No line items available.
-                </td>
-            </tr>
-        `;
+        lineRows = `<tr><td colspan="5">No line items available.</td></tr>`;
     }
 
     content.innerHTML = `
         <div class="detail-grid">
-
             <div class="detail-item">
                 <div class="detail-label">Invoice #</div>
                 <strong>${escapeHtml(invoice.invoice_number || "")}</strong>
@@ -679,14 +427,13 @@ function renderInvoiceDetail(invoice){
 
             <div class="detail-item">
                 <div class="detail-label">Job / PO</div>
-                <strong>${escapeHtml(invoice.job_label || "-")}</strong>
+                <strong>${escapeHtml(invoice.job_label || invoice.reference_number || invoice.project_name || "-")}</strong>
             </div>
 
             <div class="detail-item">
                 <div class="detail-label">Balance Due</div>
                 <strong>$${Number(invoice.balance || 0).toFixed(2)}</strong>
             </div>
-
         </div>
 
         <h3>Invoice Items</h3>
@@ -701,79 +448,52 @@ function renderInvoiceDetail(invoice){
                     <th style="text-align:right;">Total</th>
                 </tr>
             </thead>
-
-            <tbody>
-                ${lineRows}
-            </tbody>
+            <tbody>${lineRows}</tbody>
         </table>
 
         ${
             invoice.notes
-            ? `
-                <div class="note-box">
-                    <strong>Notes</strong><br>
-                    ${escapeHtml(invoice.notes)}
-                </div>
-              `
+            ? `<div class="note-box"><strong>Notes</strong><br>${escapeHtml(invoice.notes)}</div>`
             : ""
         }
 
         ${
             invoice.terms
-            ? `
-                <div class="note-box">
-                    <strong>Terms</strong><br>
-                    ${escapeHtml(invoice.terms)}
-                </div>
-              `
+            ? `<div class="note-box"><strong>Terms</strong><br>${escapeHtml(invoice.terms)}</div>`
             : ""
         }
     `;
 }
 
 function closeInvoiceDetail(){
+    activeInvoiceDetailRequest++;
     document.getElementById("invoiceDetailPanel").style.display = "none";
+    document.getElementById("invoiceDetailContent").innerHTML = "Loading invoice detail...";
+    setDetailButtonsDisabled(false);
 }
 
 function renderPaymentHistory(){
-
     const table = document.getElementById("paymentHistoryTable");
 
     if(paymentHistory.length === 0){
-
-        table.innerHTML = `
-            <tr>
-                <td colspan="5">No recent payments found.</td>
-            </tr>
-        `;
-
+        table.innerHTML = `<tr><td colspan="5">No recent payments found.</td></tr>`;
         return;
     }
 
     table.innerHTML = "";
 
     paymentHistory.forEach(payment => {
-
         const row = document.createElement("tr");
 
         row.className = "payment-row";
-
         row.onclick = () => loadPaymentDetail(payment.payment_id);
 
         row.innerHTML = `
             <td>${escapeHtml(payment.date || "")}</td>
-
-            <td>
-                <strong>${escapeHtml(payment.payment_number || "")}</strong>
-            </td>
-
+            <td><strong>${escapeHtml(payment.payment_number || "")}</strong></td>
             <td>${escapeHtml(payment.payment_mode || "")}</td>
-
             <td>${escapeHtml(payment.reference_number || "")}</td>
-
-            <td style="text-align:right;">
-                $${Number(payment.amount || 0).toFixed(2)}
-            </td>
+            <td style="text-align:right;">$${Number(payment.amount || 0).toFixed(2)}</td>
         `;
 
         table.appendChild(row);
@@ -781,76 +501,81 @@ function renderPaymentHistory(){
 }
 
 async function loadPaymentDetail(paymentId){
+    const requestId = ++activePaymentDetailRequest;
 
     const panel = document.getElementById("paymentDetailPanel");
     const content = document.getElementById("paymentDetailContent");
 
-    panel.style.display = "block";
+    document.getElementById("invoiceDetailPanel").style.display = "none";
 
+    panel.style.display = "block";
     content.innerHTML = "Loading payment detail...";
 
-    const response = await fetch(
-        `${API_BASE}/api/payment-detail?token=${encodeURIComponent(token)}&paymentId=${encodeURIComponent(paymentId)}`
-    );
+    try {
+        const response = await fetch(
+            `${API_BASE}/api/payment-detail?token=${encodeURIComponent(token)}&paymentId=${encodeURIComponent(paymentId)}`
+        );
 
-    const data = await response.json();
+        if(requestId !== activePaymentDetailRequest){
+            return;
+        }
 
-    if(!data.payment){
+        const data = await response.json();
 
-        content.innerHTML = "Unable to load payment detail.";
+        if(!response.ok || !data.payment){
+            content.innerHTML = `
+                <div class="error-message">
+                    ${escapeHtml(data.error || "Unable to load payment detail.")}
+                </div>
+            `;
+            return;
+        }
 
-        return;
+        renderPaymentDetail(data.payment);
+
+        panel.scrollIntoView({
+            behavior:"smooth",
+            block:"start"
+        });
+
+    } catch(error){
+        if(requestId !== activePaymentDetailRequest){
+            return;
+        }
+
+        console.error(error);
+
+        content.innerHTML = `
+            <div class="error-message">
+                Unable to load payment detail. Please try again.
+            </div>
+        `;
     }
-
-    renderPaymentDetail(data.payment);
-
-    panel.scrollIntoView({
-        behavior:"smooth",
-        block:"start"
-    });
 }
 
 function renderPaymentDetail(payment){
-
     const content = document.getElementById("paymentDetailContent");
 
     let invoiceRows = "";
 
     if(payment.invoices && payment.invoices.length > 0){
-
         payment.invoices.forEach(invoice => {
-
             invoiceRows += `
                 <tr>
                     <td>${escapeHtml(invoice.invoice_number || "")}</td>
                     <td>${escapeHtml(invoice.date || "")}</td>
-                    <td style="text-align:right;">
-                        $${Number(invoice.total || 0).toFixed(2)}
-                    </td>
-                    <td style="text-align:right;">
-                        $${Number(invoice.amount_applied || 0).toFixed(2)}
-                    </td>
-                    <td style="text-align:right;">
-                        $${Number(invoice.balance || 0).toFixed(2)}
-                    </td>
+                    <td style="text-align:right;">$${Number(invoice.total || 0).toFixed(2)}</td>
+                    <td style="text-align:right;">$${Number(invoice.amount_applied || 0).toFixed(2)}</td>
+                    <td style="text-align:right;">$${Number(invoice.balance || 0).toFixed(2)}</td>
                 </tr>
             `;
         });
-
     } else {
-
-        invoiceRows = `
-            <tr>
-                <td colspan="5">
-                    No invoice detail found.
-                </td>
-            </tr>
-        `;
+        invoiceRows = `<tr><td colspan="5">No invoice detail found.</td></tr>`;
     }
 
     content.innerHTML = `
         <div class="detail-grid">
-
             <div class="detail-item">
                 <div class="detail-label">Payment #</div>
                 <strong>${escapeHtml(payment.payment_number || "")}</strong>
@@ -880,7 +605,6 @@ function renderPaymentDetail(payment){
                 <div class="detail-label">Total Payment</div>
                 <strong>$${Number(payment.amount || 0).toFixed(2)}</strong>
             </div>
-
         </div>
 
         <h3>Invoices Paid</h3>
@@ -895,23 +619,19 @@ function renderPaymentDetail(payment){
                     <th style="text-align:right;">Balance</th>
                 </tr>
             </thead>
-
-            <tbody>
-                ${invoiceRows}
-            </tbody>
+            <tbody>${invoiceRows}</tbody>
         </table>
     `;
 }
 
 function closePaymentDetail(){
+    activePaymentDetailRequest++;
     document.getElementById("paymentDetailPanel").style.display = "none";
+    document.getElementById("paymentDetailContent").innerHTML = "Loading payment detail...";
 }
 
 function updateTotals(){
-
-    const checks = document.querySelectorAll(
-        'input[type="checkbox"]:checked'
-    );
+    const checks = document.querySelectorAll('input[type="checkbox"]:checked');
 
     let total = 0;
 
@@ -919,26 +639,16 @@ function updateTotals(){
         total += Number(check.dataset.balance);
     });
 
-    document.getElementById("selectedCount").innerText =
-        checks.length;
-
-    document.getElementById("invoiceTotal").innerText =
-        `$${total.toFixed(2)}`;
-
-    document.getElementById("grandTotal").innerText =
-        `$${total.toFixed(2)}`;
+    document.getElementById("selectedCount").innerText = checks.length;
+    document.getElementById("invoiceTotal").innerText = `$${total.toFixed(2)}`;
+    document.getElementById("grandTotal").innerText = `$${total.toFixed(2)}`;
 }
 
 async function continueToPayment(){
-
-    const checks = document.querySelectorAll(
-        'input[type="checkbox"]:checked'
-    );
+    const checks = document.querySelectorAll('input[type="checkbox"]:checked');
 
     if(checks.length === 0){
-
         alert("Select at least one invoice.");
-
         return;
     }
 
@@ -946,9 +656,7 @@ async function continueToPayment(){
     let total = 0;
 
     checks.forEach(check => {
-
         invoiceIds.push(check.dataset.id);
-
         total += Number(check.dataset.balance);
     });
 
@@ -970,19 +678,20 @@ async function continueToPayment(){
     const data = await response.json();
 
     if(data.checkoutUrl){
-
         window.location.href = data.checkoutUrl;
-
     } else {
-
         alert("Unable to create payment session.");
-
         console.log(data);
     }
 }
 
-function escapeHtml(value){
+function setDetailButtonsDisabled(disabled){
+    document.querySelectorAll('[data-invoice-detail-button="true"]').forEach(button => {
+        button.disabled = disabled;
+    });
+}
 
+function escapeHtml(value){
     return String(value ?? "")
         .replaceAll("&","&amp;")
         .replaceAll("<","&lt;")
@@ -990,7 +699,6 @@ function escapeHtml(value){
         .replaceAll('"',"&quot;")
         .replaceAll("'","&#039;");
 }
-
 </script>
 
 </body>
