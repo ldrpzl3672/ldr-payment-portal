@@ -254,6 +254,16 @@ async function loadInvoices(){
     }
 }
 
+function getInvoiceJobLabel(invoice){
+    return (
+        invoice.job_label ||
+        invoice.reference_number ||
+        invoice.project_name ||
+        invoice.notes ||
+        "-"
+    );
+}
+
 function renderInvoices(){
     const table = document.getElementById("invoiceTable");
 
@@ -292,7 +302,7 @@ function renderInvoices(){
             </td>
 
             <td>
-                ${escapeHtml(invoice.job_label || invoice.reference_number || invoice.project_name || "-")}
+                ${escapeHtml(getInvoiceJobLabel(invoice))}
             </td>
 
             <td>${escapeHtml(invoice.due_date || "")}</td>
@@ -427,7 +437,7 @@ function renderInvoiceDetail(invoice){
 
             <div class="detail-item">
                 <div class="detail-label">Job / PO</div>
-                <strong>${escapeHtml(invoice.job_label || invoice.reference_number || invoice.project_name || "-")}</strong>
+                <strong>${escapeHtml(getInvoiceJobLabel(invoice))}</strong>
             </div>
 
             <div class="detail-item">
