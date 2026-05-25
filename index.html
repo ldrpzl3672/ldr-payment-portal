@@ -251,12 +251,12 @@ paymentTable.innerHTML = `<tr><td colspan="5">Payment history unavailable.</td><
 return;
 }
 
+invoices = data.invoices || [];
+paymentHistory = data.payment_history || [];
+
 portalCustomerName = getPortalCustomerName(data);
 portalAccountNumber = getPortalAccountNumber(data);
 setCustomerDisplay(portalCustomerName, portalAccountNumber ? `Account # ${portalAccountNumber}` : "Secure invoice portal");
-
-invoices = data.invoices || [];
-paymentHistory = data.payment_history || [];
 
 renderInvoices();
 renderPaymentHistory();
@@ -287,17 +287,34 @@ function getPortalCustomerName(data){
 return (
 data.customer_name ||
 data.account_name ||
+data.company_name ||
+data.contact_name ||
 data.customer?.name ||
 data.customer?.customer_name ||
+data.customer?.company_name ||
+data.customer?.contact_name ||
 data.contact?.customer_name ||
 data.contact?.company_name ||
 data.contact?.contact_name ||
 (data.invoices && data.invoices[0] && (
 data.invoices[0].customer_name ||
 data.invoices[0].account_name ||
+data.invoices[0].company_name ||
 data.invoices[0].contact_name
 )) ||
-"Your Account"
+(data.payment_history && data.payment_history[0] && (
+data.payment_history[0].customer_name ||
+data.payment_history[0].account_name ||
+data.payment_history[0].company_name ||
+data.payment_history[0].contact_name
+)) ||
+(paymentHistory && paymentHistory[0] && (
+paymentHistory[0].customer_name ||
+paymentHistory[0].account_name ||
+paymentHistory[0].company_name ||
+paymentHistory[0].contact_name
+)) ||
+"Verified Customer Account"
 );
 }
 
@@ -308,12 +325,19 @@ data.account_number ||
 data.customer_id ||
 data.customer?.customer_number ||
 data.customer?.account_number ||
+data.customer?.customer_id ||
 data.contact?.customer_number ||
 data.contact?.account_number ||
+data.contact?.customer_id ||
 (data.invoices && data.invoices[0] && (
 data.invoices[0].customer_number ||
 data.invoices[0].account_number ||
 data.invoices[0].customer_id
+)) ||
+(data.payment_history && data.payment_history[0] && (
+data.payment_history[0].customer_number ||
+data.payment_history[0].account_number ||
+data.payment_history[0].customer_id
 )) ||
 ""
 );
@@ -324,7 +348,7 @@ const nameEl = document.getElementById("customerNameDisplay");
 const subtextEl = document.getElementById("customerAccountSubtext");
 
 if(nameEl){
-nameEl.innerText = name || "Your Account";
+nameEl.innerText = name || "Verified Customer Account";
 }
 
 if(subtextEl){
