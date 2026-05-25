@@ -256,7 +256,12 @@ paymentHistory = data.payment_history || [];
 
 portalCustomerName = getPortalCustomerName(data);
 portalAccountNumber = getPortalAccountNumber(data);
-setCustomerDisplay(portalCustomerName, portalAccountNumber ? `Account # ${portalAccountNumber}` : "Secure invoice portal");
+setCustomerDisplay(
+portalCustomerName,
+portalCustomerName
+? (portalAccountNumber ? `Account # ${portalAccountNumber}` : "Secure invoice portal")
+: "The website is working, but the Worker/API is not sending this customer name yet."
+);
 
 renderInvoices();
 renderPaymentHistory();
@@ -314,7 +319,7 @@ paymentHistory[0].account_name ||
 paymentHistory[0].company_name ||
 paymentHistory[0].contact_name
 )) ||
-"Verified Customer Account"
+""
 );
 }
 
@@ -348,7 +353,7 @@ const nameEl = document.getElementById("customerNameDisplay");
 const subtextEl = document.getElementById("customerAccountSubtext");
 
 if(nameEl){
-nameEl.innerText = name || "Verified Customer Account";
+nameEl.innerText = name || "Customer name not provided by portal API";
 }
 
 if(subtextEl){
