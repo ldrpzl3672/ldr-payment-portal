@@ -14,6 +14,10 @@ body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f4f4f4;color:#2
 .hero-text p{margin-top:10px;font-size:18px;}
 .lookup-box{background:white;padding:20px;border-radius:10px;width:320px;box-shadow:0 4px 12px rgba(0,0,0,.15);}
 .lookup-box h3{margin-top:0;color:#0094d9;}
+.account-display{background:#f7fbfd;border:1px solid #cfeaf7;border-radius:8px;padding:12px;margin-bottom:12px;}
+.account-label{font-size:12px;color:#666;margin-bottom:4px;}
+.account-name{font-size:17px;font-weight:bold;color:#222;line-height:1.3;}
+.account-subtext{font-size:12px;color:#777;margin-top:4px;}
 .lookup-box input{width:100%;padding:12px;border:1px solid #ccc;border-radius:5px;margin-bottom:12px;box-sizing:border-box;}
 .lookup-box button{width:100%;background:#0094d9;color:white;border:none;padding:12px;border-radius:5px;cursor:pointer;font-size:16px;}
 .main{max-width:1200px;margin:30px auto;display:flex;gap:20px;padding:0 20px;flex-wrap:wrap;}
@@ -73,7 +77,11 @@ table{min-width:850px;}
 
 <div class="lookup-box">
 <h3>Your invoices</h3>
-<input type="text" id="accessCode" readonly>
+<div class="account-display">
+<div class="account-label">Account</div>
+<div class="account-name" id="customerNameDisplay">Loading account...</div>
+<div class="account-subtext" id="customerAccountSubtext">Secure invoice portal</div>
+</div>
 <button onclick="loadInvoices()">Refresh Invoices</button>
 </div>
 </div>
@@ -163,6 +171,8 @@ const API_BASE = "https://ldr-payment-api.ldrpzl3672.workers.dev";
 
 let invoices = [];
 let paymentHistory = [];
+let portalCustomerName = "";
+let portalAccountNumber = "";
 
 let activeInvoiceDetailRequest = 0;
 let activePaymentDetailRequest = 0;
@@ -171,13 +181,13 @@ const urlParams = new URLSearchParams(window.location.search);
 const token = urlParams.get("token");
 const paymentStatus = urlParams.get("payment");
 
-document.getElementById("accessCode").value = token || "Missing payment token";
-
 window.addEventListener("DOMContentLoaded", () => {
 showPaymentStatus();
 
 if(token){
 loadInvoices();
+} else {
+setCustomerDisplay("Missing payment link", "Please use the secure payment link from your email.");
 }
 });
 
@@ -225,6 +235,8 @@ const data = await response.json();
 
 if(!response.ok || data.error){
 
+setCustomerDisplay("Unable to verify account", "Please check the payment link and refresh.");
+
 invoiceTable.innerHTML = `
 <tr>
 <td colspan="7">
@@ -239,6 +251,10 @@ paymentTable.innerHTML = `<tr><td colspan="5">Payment history unavailable.</td><
 return;
 }
 
+portalCustomerName = getPortalCustomerName(data);
+portalAccountNumber = getPortalAccountNumber(data);
+setCustomerDisplay(portalCustomerName, portalAccountNumber ? `Account # ${portalAccountNumber}` : "Secure invoice portal");
+
 invoices = data.invoices || [];
 paymentHistory = data.payment_history || [];
 
@@ -247,6 +263,8 @@ renderPaymentHistory();
 updateTotals();
 
 } catch(error){
+
+setCustomerDisplay("Unable to load account", "Please refresh and try again.");
 
 console.error(error);
 
@@ -261,6 +279,56 @@ Unable to load invoices. Please refresh and try again.
 `;
 
 paymentTable.innerHTML = `<tr><td colspan="5">Payment history unavailable.</td></tr>`;
+}
+}
+
+
+function getPortalCustomerName(data){
+return (
+data.customer_name ||
+data.account_name ||
+data.customer?.name ||
+data.customer?.customer_name ||
+data.contact?.customer_name ||
+data.contact?.company_name ||
+data.contact?.contact_name ||
+(data.invoices && data.invoices[0] && (
+data.invoices[0].customer_name ||
+data.invoices[0].account_name ||
+data.invoices[0].contact_name
+)) ||
+"Your Account"
+);
+}
+
+function getPortalAccountNumber(data){
+return (
+data.customer_number ||
+data.account_number ||
+data.customer_id ||
+data.customer?.customer_number ||
+data.customer?.account_number ||
+data.contact?.customer_number ||
+data.contact?.account_number ||
+(data.invoices && data.invoices[0] && (
+data.invoices[0].customer_number ||
+data.invoices[0].account_number ||
+data.invoices[0].customer_id
+)) ||
+""
+);
+}
+
+function setCustomerDisplay(name, subtext){
+const nameEl = document.getElementById("customerNameDisplay");
+const subtextEl = document.getElementById("customerAccountSubtext");
+
+if(nameEl){
+nameEl.innerText = name || "Your Account";
+}
+
+if(subtextEl){
+subtextEl.innerText = subtext || "Secure invoice portal";
 }
 }
 
