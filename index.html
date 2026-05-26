@@ -371,6 +371,15 @@ invoice.notes ||
 );
 }
 
+function getPaymentInvoiceId(invoice){
+return (
+invoice.invoice_id ||
+invoice.invoiceId ||
+invoice.id ||
+""
+);
+}
+
 function renderInvoices(){
 
 const table = document.getElementById("invoiceTable");
@@ -739,9 +748,27 @@ if(payment.invoices && payment.invoices.length > 0){
 
 payment.invoices.forEach(invoice => {
 
+const paidInvoiceId = getPaymentInvoiceId(invoice);
+const paidInvoiceJobLabel = getInvoiceJobLabel(invoice);
+
 invoiceRows += `
 <tr>
-<td>${escapeHtml(invoice.invoice_number || "")}</td>
+<td>
+${
+paidInvoiceId
+? `<button
+class="detail-btn"
+type="button"
+onclick="loadInvoiceDetail('${escapeHtml(paidInvoiceId)}')"
+style="margin-right:8px;"
+>
+View
+</button>`
+: `<button class="detail-btn" type="button" disabled style="margin-right:8px;">View</button>`
+}
+<strong>${escapeHtml(invoice.invoice_number || "")}</strong>
+</td>
+<td>${escapeHtml(paidInvoiceJobLabel)}</td>
 <td>${escapeHtml(invoice.date || "")}</td>
 <td style="text-align:right;">$${Number(invoice.total || 0).toFixed(2)}</td>
 <td style="text-align:right;">$${Number(invoice.amount_applied || 0).toFixed(2)}</td>
@@ -797,6 +824,7 @@ content.innerHTML = `
 <thead>
 <tr>
 <th>Invoice</th>
+<th>Job / PO</th>
 <th>Date</th>
 <th style="text-align:right;">Invoice Total</th>
 <th style="text-align:right;">Amount Applied</th>
