@@ -52,6 +52,8 @@ td{padding:12px 8px;border-bottom:1px solid #eee;font-size:14px;}
 .cancelled{background:#fff8e1;border:1px solid #ffcc80;color:#7a4b00;}
 .error-message{background:#ffebee;border:1px solid #e57373;color:#c62828;padding:12px;border-radius:6px;}
 .pending-note{font-size:12px;color:#6a1b9a;margin-top:4px;}
+.embedded-invoice-detail{margin-top:18px;border-top:3px solid #8dc63f;padding-top:16px;}
+.embedded-invoice-detail h3{margin-top:0;}
 @media(max-width:800px){
 .left-column{min-width:100%;}
 .summary-panel{width:100%;}
@@ -547,6 +549,10 @@ setDetailButtonsDisabled(false);
 function renderInvoiceDetail(invoice){
 
 const content = document.getElementById("invoiceDetailContent");
+content.innerHTML = buildInvoiceDetailHtml(invoice);
+}
+
+function buildInvoiceDetailHtml(invoice){
 
 let lineRows = "";
 
@@ -571,7 +577,7 @@ lineRows += `
 lineRows = `<tr><td colspan="5">No line items available.</td></tr>`;
 }
 
-content.innerHTML = `
+return `
 <div class="detail-grid">
 
 <div class="detail-item">
@@ -641,7 +647,6 @@ invoice.terms
 }
 `;
 }
-
 function closeInvoiceDetail(){
 activeInvoiceDetailRequest++;
 document.getElementById("invoiceDetailPanel").style.display = "none";
@@ -738,6 +743,88 @@ Unable to load payment detail. Please try again.
 }
 }
 
+
+async function loadPaidInvoiceDetail(invoiceId){
+
+const requestId = ++activeInvoiceDetailRequest;
+const container = document.getElementById("paidInvoiceDetailPanel");
+const content = document.getElementById("paidInvoiceDetailContent");
+
+if(!container || !content){
+return;
+}
+
+container.style.display = "block";
+content.innerHTML = "Loading invoice detail...";
+
+setDetailButtonsDisabled(true);
+
+try {
+
+const response = await fetch(
+`${API_BASE}/api/invoice-detail?token=${encodeURIComponent(token)}&invoiceId=${encodeURIComponent(invoiceId)}`
+);
+
+if(requestId !== activeInvoiceDetailRequest){
+return;
+}
+
+const data = await response.json();
+
+if(!response.ok || !data.invoice){
+
+content.innerHTML = `
+<div class="error-message">
+${escapeHtml(data.error || "Unable to load invoice detail.")}
+</div>
+`;
+
+return;
+}
+
+content.innerHTML = buildInvoiceDetailHtml(data.invoice);
+
+container.scrollIntoView({
+behavior:"smooth",
+block:"start"
+});
+
+} catch(error){
+
+if(requestId !== activeInvoiceDetailRequest){
+return;
+}
+
+console.error(error);
+
+content.innerHTML = `
+<div class="error-message">
+Unable to load invoice detail. Please try again.
+</div>
+`;
+
+} finally {
+
+if(requestId === activeInvoiceDetailRequest){
+setDetailButtonsDisabled(false);
+}
+
+}
+}
+
+function closePaidInvoiceDetail(){
+activeInvoiceDetailRequest++;
+const container = document.getElementById("paidInvoiceDetailPanel");
+const content = document.getElementById("paidInvoiceDetailContent");
+if(container){
+container.style.display = "none";
+}
+if(content){
+content.innerHTML = "Loading invoice detail...";
+}
+setDetailButtonsDisabled(false);
+}
+
 function renderPaymentDetail(payment){
 
 const content = document.getElementById("paymentDetailContent");
@@ -759,7 +846,8 @@ paidInvoiceId
 ? `<button
 class="detail-btn"
 type="button"
-onclick="loadInvoiceDetail('${escapeHtml(paidInvoiceId)}')"
+data-invoice-detail-button="true"
+onclick="loadPaidInvoiceDetail('${escapeHtml(paidInvoiceId)}')"
 style="margin-right:8px;"
 >
 View
@@ -834,11 +922,18 @@ content.innerHTML = `
 
 <tbody>${invoiceRows}</tbody>
 </table>
+
+<div id="paidInvoiceDetailPanel" class="embedded-invoice-detail" style="display:none;">
+<button class="close-btn" type="button" onclick="closePaidInvoiceDetail()">Close Invoice Detail</button>
+<h3>Paid Invoice Details</h3>
+<div id="paidInvoiceDetailContent">Loading invoice detail...</div>
+</div>
 `;
 }
 
 function closePaymentDetail(){
 activePaymentDetailRequest++;
+closePaidInvoiceDetail();
 document.getElementById("paymentDetailPanel").style.display = "none";
 document.getElementById("paymentDetailContent").innerHTML = "Loading payment detail...";
 }
