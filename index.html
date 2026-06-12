@@ -782,7 +782,12 @@ ${escapeHtml(data.error || "Unable to load invoice detail.")}
 return;
 }
 
-content.innerHTML = buildInvoiceDetailHtml(data.invoice);
+content.innerHTML = `
+  <button class="detail-btn" type="button" onclick="printPaidInvoiceDetail()" style="margin-bottom:12px;">
+    Print / Save PDF
+  </button>
+  ${buildInvoiceDetailHtml(data.invoice)}
+`;
 
 container.scrollIntoView({
 behavior:"smooth",
@@ -1005,6 +1010,58 @@ return;
 
 alert(data.error || "Unable to create payment session.");
 console.log(data);
+}
+
+
+function printPaidInvoiceDetail(){
+const content = document.getElementById("paidInvoiceDetailContent");
+
+if(!content){
+alert("Invoice detail is not loaded yet.");
+return;
+}
+
+const printWindow = window.open("", "_blank");
+
+if(!printWindow){
+alert("The browser blocked the print window. Please allow pop-ups for this payment portal and try again.");
+return;
+}
+
+printWindow.document.write(`
+<html>
+<head>
+<title>Invoice</title>
+<style>
+body{font-family:Arial,Helvetica,sans-serif;color:#222;padding:30px;}
+h2{margin-top:0;color:#0094d9;}
+table{width:100%;border-collapse:collapse;margin-top:10px;}
+th,td{border-bottom:1px solid #ddd;padding:8px;text-align:left;font-size:13px;}
+th{background:#f4f4f4;}
+.detail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:18px;}
+.detail-item{background:#f7f7f7;border-radius:6px;padding:10px;font-size:14px;}
+.detail-label{font-size:12px;color:#666;margin-bottom:4px;}
+.note-box{background:#f9f9f9;border-left:4px solid #0094d9;padding:12px;margin-top:15px;border-radius:6px;}
+.detail-btn,.close-btn{display:none;}
+@media print{
+body{padding:20px;}
+button{display:none!important;}
+}
+</style>
+</head>
+<body>
+<h2>Lester Digital Invoice</h2>
+${content.innerHTML}
+<script>
+window.onload = function(){
+window.print();
+};
+<\/script>
+</body>
+</html>
+`);
+
+printWindow.document.close();
 }
 
 function setDetailButtonsDisabled(disabled){
