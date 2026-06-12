@@ -782,12 +782,7 @@ ${escapeHtml(data.error || "Unable to load invoice detail.")}
 return;
 }
 
-content.innerHTML = `
-  <button class="detail-btn" type="button" onclick="printPaidInvoiceDetail()" style="margin-bottom:12px;">
-    Print / Save PDF
-  </button>
-  ${buildInvoiceDetailHtml(data.invoice)}
-`;
+content.innerHTML = buildInvoiceDetailHtml(data.invoice);
 
 container.scrollIntoView({
 behavior:"smooth",
@@ -846,6 +841,7 @@ const paidInvoiceJobLabel = getInvoiceJobLabel(invoice);
 invoiceRows += `
 <tr>
 <td>
+<div class="paid-invoice-actions">
 ${
 paidInvoiceId
 ? `<button
@@ -853,13 +849,31 @@ class="detail-btn"
 type="button"
 data-invoice-detail-button="true"
 onclick="loadPaidInvoiceDetail('${escapeHtml(paidInvoiceId)}')"
-style="margin-right:8px;"
 >
 View
+</button>
+<button
+class="print-btn"
+type="button"
+data-invoice-detail-button="true"
+onclick="printPaidInvoicePdf('${escapeHtml(paidInvoiceId)}')"
+>
+Print PDF
+</button>
+<button
+class="download-btn"
+type="button"
+data-invoice-detail-button="true"
+onclick="downloadPaidInvoicePdf('${escapeHtml(paidInvoiceId)}','${escapeHtml(invoice.invoice_number || paidInvoiceId)}')"
+>
+Download PDF
 </button>`
-: `<button class="detail-btn" type="button" disabled style="margin-right:8px;">View</button>`
+: `<button class="detail-btn" type="button" disabled>View</button>
+<button class="print-btn" type="button" disabled>Print PDF</button>
+<button class="download-btn" type="button" disabled>Download PDF</button>`
 }
 <strong>${escapeHtml(invoice.invoice_number || "")}</strong>
+</div>
 </td>
 <td>${escapeHtml(paidInvoiceJobLabel)}</td>
 <td>${escapeHtml(invoice.date || "")}</td>
@@ -933,6 +947,128 @@ content.innerHTML = `
 <h3>Paid Invoice Details</h3>
 <div id="paidInvoiceDetailContent">Loading invoice detail...</div>
 </div>
+`;
+}
+
+
+
+async function printPaidInvoicePdf(invoiceId){
+
+setDetailButtonsDisabled(true);
+
+try {
+
+const response = await fetch(
+`${API_BASE}/api/invoice-detail?token=${encodeURIComponent(token)}&invoiceId=${encodeURIComponent(invoiceId)}`
+);
+
+const data = await response.json();
+
+if(!response.ok || !data.invoice){
+alert(data.error || "Unable to load invoice for printing.");
+return;
+}
+
+const printWindow = window.open("", "_blank");
+
+if(!printWindow){
+alert("Popup blocked. Please allow popups for this site and try again.");
+return;
+}
+
+printWindow.document.write(buildPrintableInvoiceHtml(data.invoice));
+printWindow.document.close();
+
+} catch(error){
+console.error(error);
+alert("Unable to print invoice. Please try again.");
+} finally {
+setDetailButtonsDisabled(false);
+}
+}
+
+async function downloadPaidInvoicePdf(invoiceId, invoiceNumber){
+
+setDetailButtonsDisabled(true);
+
+try {
+
+const response = await fetch(
+`${API_BASE}/api/invoice-pdf?token=${encodeURIComponent(token)}&invoiceId=${encodeURIComponent(invoiceId)}`
+);
+
+if(!response.ok){
+let errorText = "Unable to download invoice PDF. The payment portal Worker may need the /api/invoice-pdf route added.";
+try {
+const data = await response.json();
+if(data && data.error){
+errorText = data.error;
+}
+} catch(e) {}
+alert(errorText);
+return;
+}
+
+const blob = await response.blob();
+const url = window.URL.createObjectURL(blob);
+const link = document.createElement("a");
+const safeInvoiceNumber = String(invoiceNumber || invoiceId || "invoice").replace(/[^a-zA-Z0-9-_]/g,"-");
+
+link.href = url;
+link.download = `Invoice-${safeInvoiceNumber}.pdf`;
+document.body.appendChild(link);
+link.click();
+link.remove();
+window.URL.revokeObjectURL(url);
+
+} catch(error){
+console.error(error);
+alert("Unable to download invoice PDF. Please try again.");
+} finally {
+setDetailButtonsDisabled(false);
+}
+}
+
+function buildPrintableInvoiceHtml(invoice){
+return `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Invoice ${escapeHtml(invoice.invoice_number || "")}</title>
+<style>
+body{font-family:Arial,Helvetica,sans-serif;color:#222;padding:30px;}
+.print-header{border-bottom:4px solid #8dc63f;margin-bottom:20px;padding-bottom:12px;}
+.print-header h1{margin:0;color:#0094d9;font-size:28px;}
+.print-header div{font-size:13px;color:#555;margin-top:4px;}
+table{width:100%;border-collapse:collapse;margin-top:10px;}
+th,td{border-bottom:1px solid #ddd;padding:8px;text-align:left;font-size:13px;vertical-align:top;}
+th{background:#f4f4f4;color:#555;}
+.detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:18px;}
+.detail-item{background:#f7f7f7;border-radius:6px;padding:10px;font-size:14px;}
+.detail-label{font-size:12px;color:#666;margin-bottom:4px;}
+.note-box{background:#f9f9f9;border-left:4px solid #0094d9;padding:12px;margin-top:15px;border-radius:6px;}
+button{display:none;}
+@media print{
+body{padding:10px;}
+}
+</style>
+</head>
+<body>
+<div class="print-header">
+<h1>Lester Digital Reprographics</h1>
+<div>1633 W Main Street, Suite 900, Lebanon, TN 37087 | print@ldrepro.com</div>
+</div>
+${buildInvoiceDetailHtml(invoice)}
+<script>
+window.onload = function(){
+window.focus();
+window.print();
+};
+<\/script>
+</body>
+</html>
 `;
 }
 
@@ -1010,58 +1146,6 @@ return;
 
 alert(data.error || "Unable to create payment session.");
 console.log(data);
-}
-
-
-function printPaidInvoiceDetail(){
-const content = document.getElementById("paidInvoiceDetailContent");
-
-if(!content){
-alert("Invoice detail is not loaded yet.");
-return;
-}
-
-const printWindow = window.open("", "_blank");
-
-if(!printWindow){
-alert("The browser blocked the print window. Please allow pop-ups for this payment portal and try again.");
-return;
-}
-
-printWindow.document.write(`
-<html>
-<head>
-<title>Invoice</title>
-<style>
-body{font-family:Arial,Helvetica,sans-serif;color:#222;padding:30px;}
-h2{margin-top:0;color:#0094d9;}
-table{width:100%;border-collapse:collapse;margin-top:10px;}
-th,td{border-bottom:1px solid #ddd;padding:8px;text-align:left;font-size:13px;}
-th{background:#f4f4f4;}
-.detail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:18px;}
-.detail-item{background:#f7f7f7;border-radius:6px;padding:10px;font-size:14px;}
-.detail-label{font-size:12px;color:#666;margin-bottom:4px;}
-.note-box{background:#f9f9f9;border-left:4px solid #0094d9;padding:12px;margin-top:15px;border-radius:6px;}
-.detail-btn,.close-btn{display:none;}
-@media print{
-body{padding:20px;}
-button{display:none!important;}
-}
-</style>
-</head>
-<body>
-<h2>Lester Digital Invoice</h2>
-${content.innerHTML}
-<script>
-window.onload = function(){
-window.print();
-};
-<\/script>
-</body>
-</html>
-`);
-
-printWindow.document.close();
 }
 
 function setDetailButtonsDisabled(disabled){
