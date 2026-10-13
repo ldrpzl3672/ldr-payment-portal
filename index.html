@@ -112,10 +112,10 @@ table{min-width:850px;}
 <h2 id="agingHeading">Account Balance &amp; Aging</h2>
 <div class="aging-grid" id="agingTotals" aria-live="polite">Loading account balances...</div>
 <div class="selection-actions">
-<button type="button" id="selectAllInvoices" onclick="selectAgingCategory('all')" disabled>Select All Open Invoices</button>
+<button type="button" id="selectAllInvoices" onclick="selectAgingCategory('all', true)" disabled>Select All Open Invoices</button>
 <button type="button" id="clearInvoices" onclick="selectAgingCategory(null)" disabled>Clear Selection</button>
 </div>
-<p class="aging-note">Aging is based on the invoice due date. Click a category to replace your selection with eligible invoices in that category. Pending ACH balances are included in totals but cannot be selected for another payment.</p>
+<p class="aging-note">Aging is based on the invoice due date. Click categories to add their invoices to your selection. Click a highlighted category again to clear only that section. Pending ACH balances are included in totals but cannot be selected for another payment.</p>
 </section>
 
 <div class="invoice-panel">
@@ -195,7 +195,6 @@ Total: <span id="grandTotal">$0.00</span>
 const API_BASE = "https://ldr-payment-api.ldrpzl3672.workers.dev";
 
 let invoices = [];
-let activeAgingCategory = null;
 let paymentHistory = [];
 let portalCustomerName = "";
 let portalAccountNumber = "";
@@ -250,7 +249,6 @@ async function loadInvoices(){
 const invoiceTable = document.getElementById("invoiceTable");
 const paymentTable = document.getElementById("paymentHistoryTable");
 invoices = [];
-activeAgingCategory = null;
 updateTotals();
 document.getElementById("agingTotals").textContent = "Loading account balances...";
 document.getElementById("selectAllInvoices").disabled = true;
@@ -463,11 +461,15 @@ document.getElementById("agingTotals").innerHTML = agingCategories.filter(([key]
 document.getElementById("selectAllInvoices").disabled = !invoices.some(isInvoiceSelectable);
 document.getElementById("clearInvoices").disabled = false;
 }
-function selectAgingCategory(category){
-activeAgingCategory = category;
-document.querySelectorAll('#invoiceTable input[type="checkbox"]').forEach(check => {
-check.checked = !check.disabled && category !== null && (category === "all" || check.dataset.aging === category);
-});
+function selectAgingCategory(category, selectAll = false){
+const checks = Array.from(document.querySelectorAll('#invoiceTable input[type="checkbox"]'));
+if(category === null){
+checks.forEach(check => { check.checked = false; });
+} else {
+const section = checks.filter(check => !check.disabled && (category === "all" || check.dataset.aging === category));
+const selected = selectAll || !section.every(check => check.checked);
+section.forEach(check => { check.checked = selected; });
+}
 updateTotals();
 }
 function formatMoney(cents){
@@ -511,7 +513,7 @@ row.innerHTML = `
 <td>
 <input
 type="checkbox"
-onchange="activeAgingCategory = null; updateTotals()"
+onchange="updateTotals()"
 data-id="${escapeHtml(invoice.invoice_id)}"
 data-balance="${invoiceBalanceCents(invoice) / 100}"
 data-aging="${getAgingCategory(invoice)}"
@@ -1180,7 +1182,9 @@ document.getElementById("selectedCount").innerText = checks.length;
 document.getElementById("invoiceTotal").innerText = formatMoney(cents);
 document.getElementById("grandTotal").innerText = formatMoney(cents);
 document.querySelectorAll('[data-aging-category]').forEach(button => {
-button.setAttribute("aria-pressed", String(button.dataset.agingCategory === activeAgingCategory));
+const category = button.dataset.agingCategory;
+const section = Array.from(document.querySelectorAll('#invoiceTable input[type="checkbox"]')).filter(check => !check.disabled && (category === "all" || check.dataset.aging === category));
+button.setAttribute("aria-pressed", String(section.length > 0 && section.every(check => check.checked)));
 });
 updatePayButtonState();
 }
