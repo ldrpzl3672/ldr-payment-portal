@@ -54,6 +54,19 @@ td{padding:12px 8px;border-bottom:1px solid #eee;font-size:14px;}
 .pending-note{font-size:12px;color:#6a1b9a;margin-top:4px;}
 .embedded-invoice-detail{margin-top:18px;border-top:3px solid #8dc63f;padding-top:16px;}
 .embedded-invoice-detail h3{margin-top:0;}
+.aging-panel{background:white;border-radius:10px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.1);margin-bottom:20px;}
+.aging-panel h2{margin-top:0;}
+.aging-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:10px;}
+.aging-card{font:inherit;text-align:left;background:#f7fbfd;border:1px solid #cfeaf7;border-radius:8px;padding:14px;cursor:pointer;color:#222;min-width:0;}
+.aging-card strong{display:block;font-size:20px;margin-top:8px;overflow-wrap:anywhere;}
+.aging-card small{display:block;color:#666;margin-top:6px;}
+.aging-card[aria-pressed="true"]{border:2px solid #0094d9;background:#e5f5fc;padding:13px;}
+.aging-card:focus-visible,.selection-actions button:focus-visible{outline:3px solid #0094d9;outline-offset:3px;}
+.aging-card:disabled{cursor:default;opacity:.65;}
+.selection-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px;}
+.selection-actions button{font:inherit;border:1px solid #0094d9;background:white;color:#006c9e;border-radius:5px;padding:10px 14px;cursor:pointer;}
+.aging-note{font-size:13px;color:#666;line-height:1.5;}
+@media(max-width:800px){.aging-grid{grid-template-columns:repeat(2,minmax(0,1fr));}.aging-panel{box-sizing:border-box;width:100%;}}
 @media(max-width:800px){
 .left-column{min-width:100%;}
 .summary-panel{width:100%;}
@@ -94,6 +107,16 @@ table{min-width:850px;}
 <div class="main">
 
 <div class="left-column">
+
+<section class="aging-panel" aria-labelledby="agingHeading">
+<h2 id="agingHeading">Account Balance &amp; Aging</h2>
+<div class="aging-grid" id="agingTotals" aria-live="polite">Loading account balances...</div>
+<div class="selection-actions">
+<button type="button" id="selectAllInvoices" onclick="selectAgingCategory('all')" disabled>Select All Open Invoices</button>
+<button type="button" id="clearInvoices" onclick="selectAgingCategory(null)" disabled>Clear Selection</button>
+</div>
+<p class="aging-note">Aging is based on the invoice due date. Click a category to replace your selection with eligible invoices in that category. Pending ACH balances are included in totals but cannot be selected for another payment.</p>
+</section>
 
 <div class="invoice-panel">
 <h2>Open Invoices</h2>
@@ -172,6 +195,7 @@ Total: <span id="grandTotal">$0.00</span>
 const API_BASE = "https://ldr-payment-api.ldrpzl3672.workers.dev";
 
 let invoices = [];
+let activeAgingCategory = null;
 let paymentHistory = [];
 let portalCustomerName = "";
 let portalAccountNumber = "";
@@ -185,10 +209,12 @@ const paymentStatus = urlParams.get("payment");
 
 window.addEventListener("DOMContentLoaded", () => {
 showPaymentStatus();
+updatePayButtonState();
 
 if(token){
 loadInvoices();
 } else {
+document.getElementById("agingTotals").textContent = "Use your secure payment link to view balances.";
 setCustomerDisplay("Missing payment link", "Please use the secure payment link from your email.");
 }
 });
@@ -223,6 +249,12 @@ No payment was made.
 async function loadInvoices(){
 const invoiceTable = document.getElementById("invoiceTable");
 const paymentTable = document.getElementById("paymentHistoryTable");
+invoices = [];
+activeAgingCategory = null;
+updateTotals();
+document.getElementById("agingTotals").textContent = "Loading account balances...";
+document.getElementById("selectAllInvoices").disabled = true;
+document.getElementById("clearInvoices").disabled = true;
 
 invoiceTable.innerHTML = `<tr><td colspan="7">Loading invoices...</td></tr>`;
 paymentTable.innerHTML = `<tr><td colspan="5">Loading payment history...</td></tr>`;
@@ -237,6 +269,7 @@ const data = await response.json();
 
 if(!response.ok || data.error){
 
+document.getElementById("agingTotals").textContent = "Account balances unavailable. Please refresh.";
 setCustomerDisplay("Unable to verify account", "Please check the payment link and refresh.");
 
 invoiceTable.innerHTML = `
@@ -266,11 +299,13 @@ portalCustomerName
 );
 
 renderInvoices();
+renderAgingTotals();
 renderPaymentHistory();
 updateTotals();
 
 } catch(error){
 
+document.getElementById("agingTotals").textContent = "Account balances unavailable. Please refresh.";
 setCustomerDisplay("Unable to load account", "Please refresh and try again.");
 
 console.error(error);
@@ -382,6 +417,63 @@ invoice.id ||
 );
 }
 
+const agingCategories = [
+["all", "Total Outstanding"], ["current", "Current"], ["1-30", "1–30 Days"],
+["31-60", "31–60 Days"], ["61-90", "61–90 Days"], ["90-plus", "90+ Days"],
+["unknown", "Due Date Unavailable"]
+];
+function invoiceBalanceCents(invoice){
+const balance = Number(invoice.balance);
+return Number.isFinite(balance) && balance > 0 ? Math.round(balance * 100) : 0;
+}
+function isInvoiceSelectable(invoice){
+return !invoice.payment_blocked && !invoice.pending_ach_payment && invoice.status !== "pending_ach" && invoiceBalanceCents(invoice) > 0;
+}
+function getAgingCategory(invoice, today = new Date()){
+// Calendar days in Lebanon, TN; UTC arithmetic avoids daylight-saving offsets.
+const parts = new Intl.DateTimeFormat("en-US", {timeZone:"America/Chicago",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(today);
+const dateParts = Object.fromEntries(parts.map(part => [part.type,part.value]));
+const todayDay = Date.UTC(Number(dateParts.year), Number(dateParts.month)-1, Number(dateParts.day));
+const match = /^(\d{4})-(\d{2})-(\d{2})(?:$|T)/.exec(String(invoice.due_date || ""));
+if(!match) return "unknown";
+const year = Number(match[1]), month = Number(match[2]), day = Number(match[3]);
+const dueDay = Date.UTC(year, month-1, day);
+const check = new Date(dueDay);
+if(check.getUTCFullYear() !== year || check.getUTCMonth() !== month-1 || check.getUTCDate() !== day) return "unknown";
+const overdueDays = Math.round((todayDay - dueDay) / 86400000);
+if(overdueDays <= 0) return "current";
+if(overdueDays <= 30) return "1-30";
+if(overdueDays <= 60) return "31-60";
+if(overdueDays <= 90) return "61-90";
+return "90-plus";
+}
+function renderAgingTotals(){
+const totals = Object.fromEntries(agingCategories.map(([key]) => [key,{cents:0,count:0}]));
+invoices.forEach(invoice => {
+const cents = invoiceBalanceCents(invoice);
+if(!cents) return;
+const bucket = getAgingCategory(invoice);
+totals.all.cents += cents; totals.all.count++;
+totals[bucket].cents += cents; totals[bucket].count++;
+});
+document.getElementById("agingTotals").innerHTML = agingCategories.filter(([key]) => key !== "unknown" || totals.unknown.count).map(([key,label]) => `
+<button type="button" class="aging-card" data-aging-category="${key}" aria-pressed="false" onclick="selectAgingCategory('${key}')">
+<span>${label}</span><strong>${formatMoney(totals[key].cents)}</strong><small>${totals[key].count} invoice${totals[key].count === 1 ? "" : "s"}</small>
+</button>`).join("");
+document.getElementById("selectAllInvoices").disabled = !invoices.some(isInvoiceSelectable);
+document.getElementById("clearInvoices").disabled = false;
+}
+function selectAgingCategory(category){
+activeAgingCategory = category;
+document.querySelectorAll('#invoiceTable input[type="checkbox"]').forEach(check => {
+check.checked = !check.disabled && category !== null && (category === "all" || check.dataset.aging === category);
+});
+updateTotals();
+}
+function formatMoney(cents){
+return new Intl.NumberFormat("en-US",{style:"currency",currency:"USD"}).format(cents / 100);
+}
+
 function renderInvoices(){
 
 const table = document.getElementById("invoiceTable");
@@ -397,7 +489,7 @@ invoices.forEach(invoice => {
 
 const row = document.createElement("tr");
 
-if(invoice.payment_blocked){
+if(!isInvoiceSelectable(invoice)){
 row.classList.add("blocked-row");
 }
 
@@ -419,10 +511,11 @@ row.innerHTML = `
 <td>
 <input
 type="checkbox"
-onchange="updateTotals()"
+onchange="activeAgingCategory = null; updateTotals()"
 data-id="${escapeHtml(invoice.invoice_id)}"
-data-balance="${Number(invoice.balance)}"
-${invoice.payment_blocked ? "disabled" : ""}
+data-balance="${invoiceBalanceCents(invoice) / 100}"
+data-aging="${getAgingCategory(invoice)}"
+${!isInvoiceSelectable(invoice) ? "disabled" : ""}
 />
 </td>
 
@@ -474,7 +567,7 @@ updatePayButtonState();
 
 function updatePayButtonState(){
 
-const availableInvoices = invoices.filter(invoice => !invoice.payment_blocked);
+const availableInvoices = invoices.filter(isInvoiceSelectable);
 
 document.getElementById("payButton").disabled = availableInvoices.length === 0;
 }
@@ -1080,23 +1173,21 @@ document.getElementById("paymentDetailContent").innerHTML = "Loading payment det
 }
 
 function updateTotals(){
-
-const checks = document.querySelectorAll('input[type="checkbox"]:checked');
-
-let total = 0;
-
-checks.forEach(check => {
-total += Number(check.dataset.balance);
-});
-
+const checks = document.querySelectorAll('#invoiceTable input[type="checkbox"]:checked:not(:disabled)');
+let cents = 0;
+checks.forEach(check => { cents += Math.round(Number(check.dataset.balance) * 100); });
 document.getElementById("selectedCount").innerText = checks.length;
-document.getElementById("invoiceTotal").innerText = `$${total.toFixed(2)}`;
-document.getElementById("grandTotal").innerText = `$${total.toFixed(2)}`;
+document.getElementById("invoiceTotal").innerText = formatMoney(cents);
+document.getElementById("grandTotal").innerText = formatMoney(cents);
+document.querySelectorAll('[data-aging-category]').forEach(button => {
+button.setAttribute("aria-pressed", String(button.dataset.agingCategory === activeAgingCategory));
+});
+updatePayButtonState();
 }
 
 async function continueToPayment(){
 
-const checks = document.querySelectorAll('input[type="checkbox"]:checked');
+const checks = document.querySelectorAll('#invoiceTable input[type="checkbox"]:checked:not(:disabled)');
 
 if(checks.length === 0){
 alert("Select at least one invoice.");
