@@ -39,6 +39,7 @@ td{padding:12px 8px;border-bottom:1px solid #eee;font-size:14px;}
 .pay-btn:disabled{opacity:.6;cursor:not-allowed;}
 .detail-btn{background:#0094d9;color:white;border:none;padding:6px 10px;border-radius:5px;cursor:pointer;font-size:12px;}
 .detail-btn:disabled{opacity:.55;cursor:not-allowed;}
+.invoice-icon{background:#075985;color:white;border:0;border-radius:5px;padding:7px 10px;margin:2px;cursor:pointer;font-size:16px;}
 .open-invoice-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;}
 .open-invoice-controls{display:flex;flex-direction:column;align-items:flex-end;gap:8px;margin-left:auto;}
 #openInvoiceActions:not([hidden]){display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px;}
@@ -117,6 +118,8 @@ table{min-width:850px;}
 <h2 id="agingHeading">Account Balance &amp; Aging</h2>
 <div class="aging-grid" id="agingTotals" aria-live="polite">Loading account balances...</div>
 <div class="selection-actions">
+<button type="button" id="printSelected" onclick="printInvoiceBatch(selectedInvoiceIds())" disabled>Print selected invoices</button>
+<button type="button" id="downloadSelected" onclick="downloadSelectedInvoices()" disabled>Download selected PDFs</button>
 <button type="button" id="selectAllInvoices" onclick="selectAgingCategory('all', true)" disabled>Select All Open Invoices</button>
 <button type="button" id="clearInvoices" onclick="selectAgingCategory(null)" disabled>Clear Selection</button>
 </div>
@@ -565,6 +568,8 @@ onclick="loadInvoiceDetail('${escapeHtml(invoice.invoice_id)}')"
 >
 Details
 </button>
+<button type="button" class="invoice-icon" aria-label="Print invoice" title="Print invoice" onclick="printInvoiceBatch([this.dataset.id])" data-id="${escapeHtml(invoice.invoice_id)}">🖨</button>
+<button type="button" class="invoice-icon" aria-label="Download invoice PDF" title="Download invoice PDF" onclick="downloadPaidInvoicePdf(this.dataset.id, this.dataset.number)" data-id="${escapeHtml(invoice.invoice_id)}" data-number="${escapeHtml(invoice.invoice_number)}">⬇</button>
 </td>
 `;
 
@@ -1151,13 +1156,14 @@ printWindow.document.close();
 }
 
 function buildPrintableInvoiceHtml(invoice){
+const documents = Array.isArray(invoice) ? invoice : [invoice];
 return `
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Invoice ${escapeHtml(invoice.invoice_number || "")}</title>
+<title>Invoice ${escapeHtml(documents.length === 1 ? documents[0].invoice_number || "" : "selected invoices")}</title>
 <style>
 body{font-family:Arial,Helvetica,sans-serif;color:#222;padding:30px;}
 .print-header{border-bottom:4px solid #8dc63f;margin-bottom:20px;padding-bottom:12px;}
@@ -1173,6 +1179,7 @@ th{background:#f4f4f4;color:#555;}
 button{display:none;}
 @media print{
 body{padding:10px;}
+.printed-invoice + .printed-invoice{break-before:page;}
 }
 </style>
 </head>
@@ -1181,7 +1188,7 @@ body{padding:10px;}
 <h1>Lester Digital Reprographics</h1>
 <div>1633 W Main Street, Suite 900, Lebanon, TN 37087 | print@ldrepro.com</div>
 </div>
-${buildInvoiceDetailHtml(invoice)}
+${documents.map(item => `<section class="printed-invoice">${buildInvoiceDetailHtml(item)}</section>`).join("")}
 <script>
 window.onload = function(){
 window.focus();
@@ -1200,7 +1207,47 @@ document.getElementById("paymentDetailPanel").style.display = "none";
 document.getElementById("paymentDetailContent").innerHTML = "Loading payment detail...";
 }
 
+function selectedInvoiceIds(){
+return Array.from(document.querySelectorAll('#invoiceTable input[type="checkbox"]:checked:not(:disabled)'), item => item.dataset.id);
+}
+
+async function printInvoiceBatch(ids){
+if (!ids.length) return;
+const view = window.open("", "_blank");
+if (!view) { alert("Allow popups to print invoices."); return; }
+try {
+const details = [];
+for (const id of ids) {
+const response = await fetch(`${API_BASE}/api/invoice-detail?token=${encodeURIComponent(token)}&invoiceId=${encodeURIComponent(id)}`);
+const data = await response.json();
+if (!response.ok || !data.invoice) throw new Error();
+details.push(data.invoice);
+}
+view.document.write(buildPrintableInvoiceHtml(details));
+view.document.close();
+} catch {
+view.close();
+alert("Unable to load the selected invoices for printing.");
+}
+}
+
+async function downloadSelectedInvoices(){
+const ids = selectedInvoiceIds();
+const button = document.getElementById("downloadSelected");
+button.disabled = true;
+try {
+for (const id of ids) {
+await downloadPaidInvoicePdf(id, invoices.find(invoice => String(invoice.invoice_id) === id)?.invoice_number);
+}
+} finally {
+button.disabled = selectedInvoiceIds().length === 0;
+}
+}
+
 function updateTotals(){
+const hasSelection = selectedInvoiceIds().length > 0;
+document.getElementById("printSelected").disabled = !hasSelection;
+document.getElementById("downloadSelected").disabled = !hasSelection;
 const checks = document.querySelectorAll('#invoiceTable input[type="checkbox"]:checked:not(:disabled)');
 let cents = 0;
 checks.forEach(check => { cents += Math.round(Number(check.dataset.balance) * 100); });
