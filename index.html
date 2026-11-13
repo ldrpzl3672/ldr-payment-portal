@@ -666,7 +666,7 @@ const print = document.createElement("button");
 print.type = "button";
 print.className = "print-btn";
 print.textContent = "Print full invoice";
-print.onclick = () => openPrintableInvoice(invoice);
+print.onclick = () => printInvoiceBatch([String(invoiceId)]);
 const download = document.createElement("button");
 download.type = "button";
 download.className = "print-btn";
@@ -1077,130 +1077,42 @@ content.innerHTML = `
 
 
 
-async function printPaidInvoicePdf(invoiceId){
+function printPaidInvoicePdf(invoiceId){
+return printInvoiceBatch([String(invoiceId)]);
+}
 
-setDetailButtonsDisabled(true);
+function invoicePdfUrl(ids){
+const query = new URLSearchParams({token});
+for (const id of ids) query.append("invoiceId", id);
+return API_BASE + "/api/invoice-pdf?" + query;
+}
 
+async function fetchInvoicePdf(ids){
+const response = await fetch(invoicePdfUrl(ids), {referrerPolicy:"no-referrer"});
+if (!response.ok || !response.headers.get("Content-Type")?.startsWith("application/pdf")) {
+throw new Error("Unable to load the Zoho invoice PDF.");
+}
+return URL.createObjectURL(await response.blob());
+}
+
+async function downloadInvoicePdf(ids, filename){
 try {
-
-const response = await fetch(
-`${API_BASE}/api/invoice-detail?token=${encodeURIComponent(token)}&invoiceId=${encodeURIComponent(invoiceId)}`
-);
-
-const data = await response.json();
-
-if(!response.ok || !data.invoice){
-alert(data.error || "Unable to load invoice for printing.");
-return;
-}
-
-openPrintableInvoice(data.invoice);
-
-} catch(error){
-console.error(error);
-alert("Unable to print invoice. Please try again.");
-} finally {
-setDetailButtonsDisabled(false);
-}
-}
-
-async function downloadPaidInvoicePdf(invoiceId, invoiceNumber){
-
-setDetailButtonsDisabled(true);
-
-try {
-
-const response = await fetch(
-`${API_BASE}/api/invoice-pdf?token=${encodeURIComponent(token)}&invoiceId=${encodeURIComponent(invoiceId)}`
-);
-
-if(!response.ok){
-let errorText = "Unable to download invoice PDF. The payment portal Worker may need the /api/invoice-pdf route added.";
-try {
-const data = await response.json();
-if(data && data.error){
-errorText = data.error;
-}
-} catch(e) {}
-alert(errorText);
-return;
-}
-
-const blob = await response.blob();
-const url = window.URL.createObjectURL(blob);
+const url = await fetchInvoicePdf(ids);
 const link = document.createElement("a");
-const safeInvoiceNumber = String(invoiceNumber || invoiceId || "invoice").replace(/[^a-zA-Z0-9-_]/g,"-");
-
 link.href = url;
-link.download = `Invoice-${safeInvoiceNumber}.pdf`;
+link.download = filename;
 document.body.appendChild(link);
 link.click();
 link.remove();
-window.URL.revokeObjectURL(url);
-
-} catch(error){
-console.error(error);
-alert("Unable to download invoice PDF. Please try again.");
-} finally {
-setDetailButtonsDisabled(false);
+setTimeout(() => URL.revokeObjectURL(url), 60000);
+} catch (error) {
+alert(error.message);
 }
 }
 
-function openPrintableInvoice(invoice){
-const printWindow = window.open("", "_blank");
-
-if(!printWindow){
-alert("Popup blocked. Please allow popups for this site and try again.");
-return;
-}
-
-printWindow.document.write(buildPrintableInvoiceHtml(invoice));
-printWindow.document.close();
-}
-
-function buildPrintableInvoiceHtml(invoice){
-const documents = Array.isArray(invoice) ? invoice : [invoice];
-return `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Invoice ${escapeHtml(documents.length === 1 ? documents[0].invoice_number || "" : "selected invoices")}</title>
-<style>
-body{font-family:Arial,Helvetica,sans-serif;color:#222;padding:30px;}
-.print-header{border-bottom:4px solid #8dc63f;margin-bottom:20px;padding-bottom:12px;}
-.print-header h1{margin:0;color:#0094d9;font-size:28px;}
-.print-header div{font-size:13px;color:#555;margin-top:4px;}
-table{width:100%;border-collapse:collapse;margin-top:10px;}
-th,td{border-bottom:1px solid #ddd;padding:8px;text-align:left;font-size:13px;vertical-align:top;}
-th{background:#f4f4f4;color:#555;}
-.detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:18px;}
-.detail-item{background:#f7f7f7;border-radius:6px;padding:10px;font-size:14px;}
-.detail-label{font-size:12px;color:#666;margin-bottom:4px;}
-.note-box{background:#f9f9f9;border-left:4px solid #0094d9;padding:12px;margin-top:15px;border-radius:6px;}
-button{display:none;}
-@media print{
-body{padding:10px;}
-.printed-invoice + .printed-invoice{break-before:page;}
-}
-</style>
-</head>
-<body>
-<div class="print-header">
-<h1>Lester Digital Reprographics</h1>
-<div>1633 W Main Street, Suite 900, Lebanon, TN 37087 | print@ldrepro.com</div>
-</div>
-${documents.map(item => `<section class="printed-invoice">${buildInvoiceDetailHtml(item)}</section>`).join("")}
-<script>
-window.onload = function(){
-window.focus();
-window.print();
-};
-<\/script>
-</body>
-</html>
-`;
+function downloadPaidInvoicePdf(invoiceId, invoiceNumber){
+const number = String(invoiceNumber || invoiceId).replace(/[^a-zA-Z0-9_-]/g,"-");
+return downloadInvoicePdf([String(invoiceId)], "Invoice-" + number + ".pdf");
 }
 
 function closePaymentDetail(){
@@ -1217,28 +1129,27 @@ return Array.from(document.querySelectorAll('#invoiceTable input[type="checkbox"
 async function printInvoiceBatch(ids){
 if (!ids.length) return;
 const view = window.open("", "_blank");
-if (!view) { alert("Allow popups to print invoices."); return; }
+if (!view) { alert("Allow popups to open the invoice PDF."); return; }
+view.opener = null;
+view.document.body.textContent = "Loading Zoho invoice PDF. Use the PDF viewer’s Print button when it opens.";
 try {
-const details = [];
-for (const id of ids) {
-const response = await fetch(`${API_BASE}/api/invoice-detail?token=${encodeURIComponent(token)}&invoiceId=${encodeURIComponent(id)}`);
-const data = await response.json();
-if (!response.ok || !data.invoice) throw new Error();
-details.push(data.invoice);
-}
-view.document.write(buildPrintableInvoiceHtml(details));
-view.document.close();
-} catch {
+const url = await fetchInvoicePdf(ids);
+if (view.closed) { URL.revokeObjectURL(url); return; }
+view.location.replace(url);
+const cleanup = setInterval(() => {
+if (!view.closed) return;
+clearInterval(cleanup);
+URL.revokeObjectURL(url);
+}, 1000);
+} catch (error) {
 view.close();
-alert("Unable to load the selected invoices for printing.");
+alert(error.message);
 }
 }
 
-async function downloadSelectedInvoices(){
+function downloadSelectedInvoices(){
 const ids = selectedInvoiceIds();
-for (const id of ids) {
-await downloadPaidInvoicePdf(id, invoices.find(invoice => String(invoice.invoice_id) === id)?.invoice_number);
-}
+if (ids.length) return downloadInvoicePdf(ids, "Selected-invoices.pdf");
 }
 
 function updateTotals(){
