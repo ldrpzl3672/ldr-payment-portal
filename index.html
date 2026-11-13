@@ -213,6 +213,7 @@ let activePaymentDetailRequest = 0;
 
 const urlParams = new URLSearchParams(window.location.search);
 const token = urlParams.get("token");
+let invoiceToPreselect = urlParams.get("invoice");
 const paymentStatus = urlParams.get("payment");
 
 window.addEventListener("DOMContentLoaded", () => {
@@ -306,6 +307,15 @@ portalCustomerName
 );
 
 renderInvoices();
+if(invoiceToPreselect){
+const match = [...invoiceTable.querySelectorAll('input[type="checkbox"]:enabled')]
+.find(check => check.dataset.id === invoiceToPreselect);
+if(match){
+match.checked = true;
+match.closest("tr").scrollIntoView({block: "nearest"});
+}
+invoiceToPreselect = null;
+}
 renderAgingTotals();
 renderPaymentHistory();
 updateTotals();
