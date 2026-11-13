@@ -611,7 +611,7 @@ ${escapeHtml(data.error || "Unable to load invoice detail.")}
 return;
 }
 
-renderInvoiceDetail(data.invoice);
+renderInvoiceDetail(data.invoice, invoiceId);
 
 panel.scrollIntoView({
 behavior:"smooth",
@@ -641,10 +641,21 @@ setDetailButtonsDisabled(false);
 }
 }
 
-function renderInvoiceDetail(invoice){
+function renderInvoiceDetail(invoice, invoiceId){
 
 const content = document.getElementById("invoiceDetailContent");
 content.innerHTML = buildInvoiceDetailHtml(invoice);
+const print = document.createElement("button");
+print.type = "button";
+print.className = "print-btn";
+print.textContent = "Print full invoice";
+print.onclick = () => openPrintableInvoice(invoice);
+const download = document.createElement("button");
+download.type = "button";
+download.className = "print-btn";
+download.textContent = "Download full invoice PDF";
+download.onclick = () => downloadPaidInvoicePdf(invoiceId, invoice.invoice_number);
+content.prepend(print, download);
 }
 
 function buildInvoiceDetailHtml(invoice){
@@ -1064,15 +1075,7 @@ alert(data.error || "Unable to load invoice for printing.");
 return;
 }
 
-const printWindow = window.open("", "_blank");
-
-if(!printWindow){
-alert("Popup blocked. Please allow popups for this site and try again.");
-return;
-}
-
-printWindow.document.write(buildPrintableInvoiceHtml(data.invoice));
-printWindow.document.close();
+openPrintableInvoice(data.invoice);
 
 } catch(error){
 console.error(error);
@@ -1122,6 +1125,18 @@ alert("Unable to download invoice PDF. Please try again.");
 } finally {
 setDetailButtonsDisabled(false);
 }
+}
+
+function openPrintableInvoice(invoice){
+const printWindow = window.open("", "_blank");
+
+if(!printWindow){
+alert("Popup blocked. Please allow popups for this site and try again.");
+return;
+}
+
+printWindow.document.write(buildPrintableInvoiceHtml(invoice));
+printWindow.document.close();
 }
 
 function buildPrintableInvoiceHtml(invoice){
@@ -1262,3 +1277,4 @@ return String(value ?? "")
 
 </body>
 </html>
+
