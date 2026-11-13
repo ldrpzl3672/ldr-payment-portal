@@ -39,6 +39,11 @@ td{padding:12px 8px;border-bottom:1px solid #eee;font-size:14px;}
 .pay-btn:disabled{opacity:.6;cursor:not-allowed;}
 .detail-btn{background:#0094d9;color:white;border:none;padding:6px 10px;border-radius:5px;cursor:pointer;font-size:12px;}
 .detail-btn:disabled{opacity:.55;cursor:not-allowed;}
+.open-invoice-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;}
+.open-invoice-controls{display:flex;flex-direction:column;align-items:flex-end;gap:8px;margin-left:auto;}
+#openInvoiceActions:not([hidden]){display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px;}
+#openInvoiceActions button{background:#075985;color:white;border:1px solid #075985;border-radius:6px;padding:10px 14px;font:inherit;font-weight:700;cursor:pointer;}
+#openInvoiceActions button:hover{background:#0c4a6e;}
 .close-btn{background:#666;color:white;border:none;border-radius:5px;padding:8px 12px;cursor:pointer;float:right;}
 .detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:18px;}
 .detail-item{background:#f7f7f7;border-radius:6px;padding:10px;font-size:14px;}
@@ -141,8 +146,11 @@ table{min-width:850px;}
 </div>
 
 <div class="invoice-detail-panel" id="invoiceDetailPanel">
-<button class="close-btn" onclick="closeInvoiceDetail()">Close</button>
+<div class="open-invoice-heading">
 <h2>Invoice Details</h2>
+<div class="open-invoice-controls"><div id="openInvoiceActions" hidden></div>
+<button class="close-btn" onclick="closeInvoiceDetail()">Close</button>
+</div></div>
 <div id="invoiceDetailContent">Loading invoice detail...</div>
 </div>
 
@@ -577,6 +585,7 @@ document.getElementById("payButton").disabled = availableInvoices.length === 0;
 async function loadInvoiceDetail(invoiceId){
 
 const requestId = ++activeInvoiceDetailRequest;
+ document.getElementById("openInvoiceActions").hidden = true;
 
 const panel = document.getElementById("invoiceDetailPanel");
 const content = document.getElementById("invoiceDetailContent");
@@ -655,7 +664,9 @@ download.type = "button";
 download.className = "print-btn";
 download.textContent = "Download full invoice PDF";
 download.onclick = () => downloadPaidInvoicePdf(invoiceId, invoice.invoice_number);
-content.prepend(print, download);
+const actions = document.getElementById("openInvoiceActions");
+actions.replaceChildren(print, download);
+actions.hidden = false;
 }
 
 function buildInvoiceDetailHtml(invoice){
