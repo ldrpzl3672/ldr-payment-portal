@@ -39,8 +39,8 @@ td{padding:12px 8px;border-bottom:1px solid #eee;font-size:14px;}
 .pay-btn:disabled{opacity:.6;cursor:not-allowed;}
 .detail-btn{background:#0094d9;color:white;border:none;padding:6px 10px;border-radius:5px;cursor:pointer;font-size:12px;}
 .detail-btn:disabled{opacity:.55;cursor:not-allowed;}
-#invoiceActions{border:0;border-radius:12px;padding:24px;max-width:calc(100vw - 48px);}
-#invoiceActions::backdrop{background:#0f172a99;}
+#paymentReview{border:0;border-radius:12px;padding:24px;max-width:calc(100vw - 48px);}
+#paymentReview::backdrop{background:#0f172a99;}
 .invoice-icon{background:#075985;color:white;border:0;border-radius:5px;padding:7px 10px;margin:2px;cursor:pointer;font-size:16px;}
 .open-invoice-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;}
 .open-invoice-controls{display:flex;flex-direction:column;align-items:flex-end;gap:8px;margin-left:auto;}
@@ -128,7 +128,11 @@ table{min-width:850px;}
 
 <div class="invoice-panel">
 <h2>Open Invoices</h2>
-<div class="selection-actions"><button type="button" id="selectedActions" onclick="showInvoiceActions()" disabled>Actions for selected invoices</button></div>
+<div class="selection-actions">
+<button type="button" id="paySelected" onclick="showPaymentReview()" disabled>Pay selected</button>
+<button type="button" id="downloadSelected" onclick="downloadSelectedInvoices()" disabled>Download selected</button>
+<button type="button" id="printSelected" onclick="printInvoiceBatch(selectedInvoiceIds())" disabled>Print selected</button>
+</div>
 
 <table>
 <thead>
@@ -187,14 +191,13 @@ table{min-width:850px;}
 
 </div>
 
-<dialog id="invoiceActions" aria-labelledby="invoiceActionsTitle">
+<dialog id="paymentReview" aria-labelledby="paymentReviewTitle">
 <form method="dialog"><button class="close-btn">Close</button></form>
-<h2 id="invoiceActionsTitle">Selected invoices</h2>
+<h2 id="paymentReviewTitle">Review payment</h2>
+<ul id="paymentReviewInvoices"></ul>
 <p><span id="selectedCount">0</span> invoices · <span id="invoiceTotal">$0.00</span></p>
 <div class="selection-actions">
-<button type="button" id="payButton" onclick="continueToPayment()">Pay</button>
-<button type="button" onclick="closeInvoiceActions(); printInvoiceBatch(selectedInvoiceIds())">Print</button>
-<button type="button" onclick="closeInvoiceActions(); downloadSelectedInvoices()">Download</button>
+<button type="button" id="payButton" onclick="continueToPayment()">Continue to payment</button>
 </div>
 </dialog>
 
@@ -307,11 +310,13 @@ portalCustomerName
 );
 
 renderInvoices();
+let reviewLinkedInvoice = false;
 if(invoiceToPreselect){
 const match = [...invoiceTable.querySelectorAll('input[type="checkbox"]:enabled')]
 .find(check => check.dataset.id === invoiceToPreselect);
 if(match){
 match.checked = true;
+reviewLinkedInvoice = true;
 match.closest("tr").scrollIntoView({block: "nearest"});
 }
 invoiceToPreselect = null;
@@ -319,6 +324,7 @@ invoiceToPreselect = null;
 renderAgingTotals();
 renderPaymentHistory();
 updateTotals();
+if(reviewLinkedInvoice) showPaymentReview();
 
 } catch(error){
 
@@ -485,15 +491,18 @@ document.querySelectorAll('#invoiceTable input[type="checkbox"]').forEach(check 
 check.checked = category !== null && !check.disabled && (category === "all" || check.dataset.aging === category);
 });
 updateTotals();
-if (category !== null) showInvoiceActions();
 }
 
-function showInvoiceActions(){
-if (selectedInvoiceIds().length) document.getElementById("invoiceActions").showModal();
-}
-
-function closeInvoiceActions(){
-document.getElementById("invoiceActions").close();
+function showPaymentReview(){
+const selected = new Set(selectedInvoiceIds());
+if(!selected.size) return;
+const list = document.getElementById("paymentReviewInvoices");
+list.replaceChildren(...invoices.filter(invoice => selected.has(String(invoice.invoice_id))).map(invoice => {
+const item = document.createElement("li");
+item.textContent = "Invoice #" + invoice.invoice_number + " · " + formatMoney(invoiceBalanceCents(invoice));
+return item;
+}));
+document.getElementById("paymentReview").showModal();
 }
 
 function formatMoney(cents){
@@ -1164,7 +1173,9 @@ if (ids.length) return downloadInvoicePdf(ids, "Selected-invoices.pdf");
 
 function updateTotals(){
 const hasSelection = selectedInvoiceIds().length > 0;
-document.getElementById("selectedActions").disabled = !hasSelection;
+for(const id of ["paySelected", "downloadSelected", "printSelected"]){
+document.getElementById(id).disabled = !hasSelection;
+}
 const checks = document.querySelectorAll('#invoiceTable input[type="checkbox"]:checked:not(:disabled)');
 let cents = 0;
 checks.forEach(check => { cents += Math.round(Number(check.dataset.balance) * 100); });
@@ -1252,4 +1263,5 @@ return String(value ?? "")
 
 </body>
 </html>
+
 
