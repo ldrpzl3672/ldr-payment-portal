@@ -39,6 +39,8 @@ td{padding:12px 8px;border-bottom:1px solid #eee;font-size:14px;}
 .pay-btn:disabled{opacity:.6;cursor:not-allowed;}
 .detail-btn{background:#0094d9;color:white;border:none;padding:6px 10px;border-radius:5px;cursor:pointer;font-size:12px;}
 .detail-btn:disabled{opacity:.55;cursor:not-allowed;}
+#invoiceActions{border:0;border-radius:12px;padding:24px;max-width:calc(100vw - 48px);}
+#invoiceActions::backdrop{background:#0f172a99;}
 .invoice-icon{background:#075985;color:white;border:0;border-radius:5px;padding:7px 10px;margin:2px;cursor:pointer;font-size:16px;}
 .open-invoice-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;}
 .open-invoice-controls{display:flex;flex-direction:column;align-items:flex-end;gap:8px;margin-left:auto;}
@@ -118,16 +120,15 @@ table{min-width:850px;}
 <h2 id="agingHeading">Account Balance &amp; Aging</h2>
 <div class="aging-grid" id="agingTotals" aria-live="polite">Loading account balances...</div>
 <div class="selection-actions">
-<button type="button" id="printSelected" onclick="printInvoiceBatch(selectedInvoiceIds())" disabled>Print selected invoices</button>
-<button type="button" id="downloadSelected" onclick="downloadSelectedInvoices()" disabled>Download selected PDFs</button>
 <button type="button" id="selectAllInvoices" onclick="selectAgingCategory('all', true)" disabled>Select All Open Invoices</button>
 <button type="button" id="clearInvoices" onclick="selectAgingCategory(null)" disabled>Clear Selection</button>
 </div>
-<p class="aging-note">Aging is based on the invoice due date. Click categories to add their invoices to your selection. Click a highlighted category again to clear only that section. Pending ACH balances are included in totals but cannot be selected for another payment.</p>
+<p class="aging-note">Choose an aging group to select its invoices and open the action menu. Pending ACH balances are included in aging totals.</p>
 </section>
 
 <div class="invoice-panel">
 <h2>Open Invoices</h2>
+<div class="selection-actions"><button type="button" id="selectedActions" onclick="showInvoiceActions()" disabled>Actions for selected invoices</button></div>
 
 <table>
 <thead>
@@ -186,19 +187,16 @@ table{min-width:850px;}
 
 </div>
 
-<div class="summary-panel">
-<h3>Payment Summary</h3>
-
-<div>Selected Invoices: <span id="selectedCount">0</span></div>
-<div style="margin-top:10px;">Invoice Total: <span id="invoiceTotal">$0.00</span></div>
-<div style="margin-top:10px;">ACH Fee: <span>$0.00</span></div>
-
-<div class="total-box">
-Total: <span id="grandTotal">$0.00</span>
+<dialog id="invoiceActions" aria-labelledby="invoiceActionsTitle">
+<form method="dialog"><button class="close-btn">Close</button></form>
+<h2 id="invoiceActionsTitle">Selected invoices</h2>
+<p><span id="selectedCount">0</span> invoices · <span id="invoiceTotal">$0.00</span></p>
+<div class="selection-actions">
+<button type="button" id="payButton" onclick="continueToPayment()">Pay</button>
+<button type="button" onclick="closeInvoiceActions(); printInvoiceBatch(selectedInvoiceIds())">Print</button>
+<button type="button" onclick="closeInvoiceActions(); downloadSelectedInvoices()">Download</button>
 </div>
-
-<button class="pay-btn" id="payButton" onclick="continueToPayment()">Continue to Payment</button>
-</div>
+</dialog>
 
 </div>
 
@@ -472,17 +470,22 @@ document.getElementById("agingTotals").innerHTML = agingCategories.filter(([key]
 document.getElementById("selectAllInvoices").disabled = !invoices.some(isInvoiceSelectable);
 document.getElementById("clearInvoices").disabled = false;
 }
-function selectAgingCategory(category, selectAll = false){
-const checks = Array.from(document.querySelectorAll('#invoiceTable input[type="checkbox"]'));
-if(category === null){
-checks.forEach(check => { check.checked = false; });
-} else {
-const section = checks.filter(check => !check.disabled && (category === "all" || check.dataset.aging === category));
-const selected = selectAll || !section.every(check => check.checked);
-section.forEach(check => { check.checked = selected; });
-}
+function selectAgingCategory(category){
+document.querySelectorAll('#invoiceTable input[type="checkbox"]').forEach(check => {
+check.checked = category !== null && !check.disabled && (category === "all" || check.dataset.aging === category);
+});
 updateTotals();
+if (category !== null) showInvoiceActions();
 }
+
+function showInvoiceActions(){
+if (selectedInvoiceIds().length) document.getElementById("invoiceActions").showModal();
+}
+
+function closeInvoiceActions(){
+document.getElementById("invoiceActions").close();
+}
+
 function formatMoney(cents){
 return new Intl.NumberFormat("en-US",{style:"currency",currency:"USD"}).format(cents / 100);
 }
@@ -584,7 +587,7 @@ function updatePayButtonState(){
 
 const availableInvoices = invoices.filter(isInvoiceSelectable);
 
-document.getElementById("payButton").disabled = availableInvoices.length === 0;
+document.getElementById("payButton").disabled = selectedInvoiceIds().length === 0;
 }
 
 async function loadInvoiceDetail(invoiceId){
@@ -1233,27 +1236,20 @@ alert("Unable to load the selected invoices for printing.");
 
 async function downloadSelectedInvoices(){
 const ids = selectedInvoiceIds();
-const button = document.getElementById("downloadSelected");
-button.disabled = true;
-try {
 for (const id of ids) {
 await downloadPaidInvoicePdf(id, invoices.find(invoice => String(invoice.invoice_id) === id)?.invoice_number);
-}
-} finally {
-button.disabled = selectedInvoiceIds().length === 0;
 }
 }
 
 function updateTotals(){
 const hasSelection = selectedInvoiceIds().length > 0;
-document.getElementById("printSelected").disabled = !hasSelection;
-document.getElementById("downloadSelected").disabled = !hasSelection;
+document.getElementById("selectedActions").disabled = !hasSelection;
 const checks = document.querySelectorAll('#invoiceTable input[type="checkbox"]:checked:not(:disabled)');
 let cents = 0;
 checks.forEach(check => { cents += Math.round(Number(check.dataset.balance) * 100); });
 document.getElementById("selectedCount").innerText = checks.length;
 document.getElementById("invoiceTotal").innerText = formatMoney(cents);
-document.getElementById("grandTotal").innerText = formatMoney(cents);
+
 document.querySelectorAll('[data-aging-category]').forEach(button => {
 const category = button.dataset.agingCategory;
 const section = Array.from(document.querySelectorAll('#invoiceTable input[type="checkbox"]')).filter(check => !check.disabled && (category === "all" || check.dataset.aging === category));
