@@ -1,0 +1,9 @@
+{
+  "name": "ldr-admin-api",
+  "main": "worker.mjs",
+  "compatibility_date": "2026-11-13",
+  "workers_dev": true,
+  "preview_urls": false,
+  "keep_vars": true,
+  "services": [{ "binding": "PAYMENT_API", "service": "ldr-payment-api" }]
+}
